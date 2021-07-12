@@ -57,10 +57,8 @@ public:
     ModuleState moduleState() const;
 
 signals:
-#ifndef QT_NO_DEBUG
-    //! signals for state changing
+    //! signals for state changing only availabe if NO QT_NO_DEBUG
     void moduleStateAboutToChange(ModuleState module_state);
-#endif
     void moduleStateChanged(ModuleState module_state);
 
     void loadModule(const QString &module_name, bwaf::BModule *parent_module = nullptr);
