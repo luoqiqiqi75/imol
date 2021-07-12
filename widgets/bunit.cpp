@@ -22,6 +22,7 @@ BUnit::BUnit(const QString &unit_name, QWidget *widget):
 BUnit::~BUnit()
 {
     m().cancel(m_context, m_mobj->fullName());
+    m_mobj = m().emptyMobj();
 }
 
 QString BUnit::itemRname(const QString &item_name)
