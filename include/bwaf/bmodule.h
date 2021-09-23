@@ -58,8 +58,8 @@ public:
 
 signals:
     //! signals for state changing only availabe if NO QT_NO_DEBUG
-    void moduleStateAboutToChange(ModuleState module_state);
-    void moduleStateChanged(ModuleState module_state);
+    void moduleStateAboutToChange(bwaf::BModule::ModuleState module_state);
+    void moduleStateChanged(bwaf::BModule::ModuleState module_state);
 
     void loadModule(const QString &module_name, bwaf::BModule *parent_module = nullptr);
 
@@ -71,7 +71,7 @@ public slots:
     void startDetach();
 
     void runToNextState();
-    void runToState(ModuleState target_state);
+    void runToState(bwaf::BModule::ModuleState target_state);
 
 private:
     //!

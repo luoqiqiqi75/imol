@@ -37,8 +37,8 @@ public:
     virtual void setVar(const QVariant &var);
 
 signals:
-    void rein(StateObject *from); //deutsch
-    void raus(StateObject *to); //deutsch
+    void rein(imol::StateObject *from); //deutsch
+    void raus(imol::StateObject *to); //deutsch
 
 public slots:
 
@@ -59,7 +59,7 @@ public:
     explicit StateWatcher(QObject *parent = nullptr);
 
 signals:
-    void changed(StateObject *from, StateObject *to);
+    void changed(imol::StateObject *from, imol::StateObject *to);
 };
 
 class CORESHARED_EXPORT EmptyStateObject : public StateObject

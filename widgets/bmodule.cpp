@@ -2,7 +2,7 @@
 
 #include "../core/common.h"
 
-IMOL_VER_REG("imol.bwaf", 7)
+IMOL_VER_REG("imol.bwaf", 8)
 
 using namespace bwaf;
 
@@ -41,7 +41,7 @@ void BModule::bindMobj(const QString &full_name)
     }
 
     g_bmodule_mobj.set(this, full_name, QVariant::fromValue<BModule *>(this));
-    connect(this, &BModule::destroyed, &g_bmodule_mobj, [=, this] {g_bmodule_mobj.remove(this, full_name);});
+    connect(this, &BModule::destroyed, &g_bmodule_mobj, [=] {g_bmodule_mobj.remove(this, full_name);});
 }
 
 void BModule::unbindMobj()

@@ -538,7 +538,7 @@ void NetworkHandle::onReceive()
                 break;
             case NetworkPackage::NETWORK_JSON_PACKAGE: {
                 NetworkJsonPackage net_pkg;
-                if (net_pkg.deserialize(m_package_cache)) emit (net_pkg.isArray() ? jsonArrayObtained(net_pkg.array()) : jsonObtained(net_pkg.object()));
+                if (net_pkg.deserialize(m_package_cache)) net_pkg.isArray() ? emit jsonArrayObtained(net_pkg.array()) : emit jsonObtained(net_pkg.object());
                 m_package_cache.remove(0, net_pkg.size());
             }
                 break;
@@ -596,7 +596,7 @@ void NetworkHandle::writeToSocket(const QByteArray &bytes)
 //! NetworkObject
 NetworkObject::NetworkObject(NetworkHandle::NetworkType net_type, QThread *handle_thread, const NetworkChannel &channel,
                              QAbstractSocket *handle_socket, QObject *parent) : QObject(parent),
-    m_handle(new NetworkHandle(net_type, handle_socket, channel))
+    m_handle(new NetworkHandle(net_type, handle_socket, channel, this))
 {
     QThread *target_handle_thread = (handle_thread == nullptr ? QCoreApplication::instance()->thread() : handle_thread);
     m_handle->moveToThread(target_handle_thread);
@@ -608,16 +608,12 @@ NetworkObject::NetworkObject(NetworkHandle::NetworkType net_type, QThread *handl
     connect(this, &NetworkObject::sendFilePackage, m_handle, &NetworkHandle::onSendFilePackage);
 }
 
-NetworkObject::~NetworkObject()
-{
-    m_handle->deleteLater();
-}
-
 //! NetworkManager
 NetworkManager::NetworkManager(QObject *parent) : QObject(parent)
 {
     qRegisterMetaType<QHostAddress>("QHostAddress");
     qRegisterMetaType<QAbstractSocket::SocketError>("QAbstractSocket::SocketError");
+
     //start all threads
     for (int i = 0; i < NETWORK_MAX_THREAD_COUNT; ++i) {
         QThread *handle_thread = new QThread(this);
@@ -673,8 +669,8 @@ NetworkObject * NetworkManager::netObject(const QString &name)
 
 QString NetworkManager::findNetName(NetworkHandle *handle) const
 {
-    foreach (QString name, m_objects.keys()) {
-        if (m_objects.value(name)->handle() == handle) return name;
+    for (auto it = m_objects.cbegin(); it != m_objects.cend(); it++) {
+        if (it.value()->handle() == handle) return it.key();
     }
     return "";
 }

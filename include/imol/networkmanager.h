@@ -312,7 +312,6 @@ class CORESHARED_EXPORT NetworkObject : public QObject
 public:
     explicit NetworkObject(NetworkHandle::NetworkType net_type, QThread *handle_thread, const NetworkChannel &channel,
                            QAbstractSocket *handle_socket = nullptr, QObject *parent = nullptr);
-    virtual ~NetworkObject();
 
     NetworkHandle * handle() {return m_handle;}
 

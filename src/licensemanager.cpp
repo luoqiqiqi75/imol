@@ -72,7 +72,7 @@ QString LicenseManager::defaultInternalLicFileName()
 QString LicenseManager::defaultLicFileName()
 {
     QFileInfo fi(QCoreApplication::applicationFilePath());
-    return QString("%1/%2.lic").arg(fi.path()).arg(fi.baseName());
+    return QString("%1/%2.lic").arg(fi.path(), fi.baseName());
 }
 
 bool LicenseManager::loadFromFile(const QString &path)
@@ -159,17 +159,22 @@ LicenseError LicenseManager::checkProgrammer()
 //    QString ip = QString::fromLocal8Bit(check_cmd.readAllStandardOutput()).trimmed();
 //    return LicenseError(ip == "114.242.25.17" ? LicenseError::NO_LICENSE_ERROR : LicenseError::UNKNOWN_IP_ERROR);
 
-    QUrl url("ftp://10.0.4.30/hallo");
-    url.setUserName("qilu");
-    url.setPassword("426#tSc%J#jhNPj");
-    QNetworkAccessManager *nam = new QNetworkAccessManager(this);
-    QNetworkReply *rpl = nam->get(QNetworkRequest(url));
-    int cnt = 0;
-    while (rpl->isOpen() && !rpl->isFinished() && cnt++ < 300000) QCoreApplication::processEvents();
-    bool success = rpl->error() == QNetworkReply::NoError && QString::fromUtf8(rpl->readLine(10)) == "genau";
-    rpl->deleteLater();
-    nam->deleteLater();
-    return success ? LicenseError::NO_LICENSE_ERROR : LicenseError::UNKNOWN_IP_ERROR;
+//    QUrl url("ftp://10.0.4.30/hallo");
+//    url.setUserName("qilu");
+//    url.setPassword("426#tSc%J#jhNPj");
+//    QNetworkAccessManager *nam = new QNetworkAccessManager(this);
+//    QNetworkReply *rpl = nam->get(QNetworkRequest(url));
+//    int cnt = 0;
+//    while (rpl->isOpen() && !rpl->isFinished() && cnt++ < 300000) QCoreApplication::processEvents();
+//    bool success = rpl->error() == QNetworkReply::NoError && QString::fromUtf8(rpl->readLine(10)) == "genau";
+//    rpl->deleteLater();
+//    nam->deleteLater();
+//    return success ? LicenseError::NO_LICENSE_ERROR : LicenseError::UNKNOWN_IP_ERROR;
+
+    QProcess p;
+    p.start("nslookup", {"jenkins.rokae.local"});
+    p.waitForFinished(1000);
+    return p.readAll().trimmed().endsWith("10.0.4.9") ? LicenseError::NO_LICENSE_ERROR : LicenseError::UNKNOWN_IP_ERROR;
 }
 
 LicenseError LicenseManager::checkLegitimacy()

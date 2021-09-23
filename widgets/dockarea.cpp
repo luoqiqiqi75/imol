@@ -23,7 +23,7 @@ bool DockArea::addDockPage(QObject *context, const QString &item_name, QWidget *
     QDockWidget *dock_wgt = new QDockWidget(title, this);
     dock_wgt->setWidget(wgt);
     dock_wgt->setAttribute(Qt::WA_DeleteOnClose);
-    connect(dock_wgt, &QDockWidget::destroyed, this, [=, this] {removeItemObj(context, item_name, false);});
+    connect(dock_wgt, &QDockWidget::destroyed, this, [=] {removeItemObj(context, item_name, false);});
 
     addDockWidget(q_dock_area, dock_wgt, orientation == VERTICAL ? Qt::Vertical : Qt::Horizontal);
 

@@ -67,10 +67,10 @@ bool SideBar::removeItem(QObject *context, const QString &item_name, bool need_d
 
 SideBar * instantiatedSideBar(QObject *, bool is_left)
 {
-    return m(mName(MODULE_NAME, QString("%1%2").arg(is_left ? "left" : "right").arg(UNIT_NAME)))->get().value<SideBar *>();
+    return m(mName(MODULE_NAME, QString("%1%2").arg(is_left ? "left" : "right", UNIT_NAME)))->get().value<SideBar *>();
 }
 
 SideBar * instantiatedSideBar(bool is_left)
 {
-    return m(mName(MODULE_NAME, QString("%1%2").arg(is_left ? "left" : "right").arg(UNIT_NAME)))->get().value<SideBar *>();
+    return m(mName(MODULE_NAME, QString("%1%2").arg(is_left ? "left" : "right", UNIT_NAME)))->get().value<SideBar *>();
 }

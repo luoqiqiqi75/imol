@@ -46,10 +46,7 @@ QLog & QLog::operator << (const void *ptr)
 FLog::FLog(const QString &level_str, const QString &detail_str, const QString &file_name_prefix, const QString &file_name_suffix) :
     m_f_debug(QDebug(&m_log_file).nospace().noquote())
 {
-    QString file_name = QString("%1_%2.%3")
-            .arg(file_name_prefix)
-            .arg(QDateTime::currentDateTime().toString("yyyyMMdd"))
-            .arg(file_name_suffix);
+    QString file_name = QString("%1_%2.%3").arg(file_name_prefix, QDateTime::currentDateTime().toString("yyyyMMdd"), file_name_suffix);
     QFileInfo file_info(file_name);
     if (!file_info.dir().exists()) file_info.dir().mkpath(file_info.dir().absolutePath());
     m_log_file.setFileName(file_name);

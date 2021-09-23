@@ -115,7 +115,7 @@ bool ModuleObject::hasCmobj(const QString &child_name, bool is_strict) const
 
 bool ModuleObject::hasCmobj(ModuleObject *child_mobj) const
 {
-    return m_cmobjs.values().contains(child_mobj);
+    return std::find(m_cmobjs.cbegin(), m_cmobjs.cend(), child_mobj) != m_cmobjs.cend();
 }
 
 ModuleObject * ModuleObject::first() const
@@ -807,7 +807,8 @@ void ModuleObject::importFromBin(QObject *context, const QByteArray &bytes, bool
     }
 }
 
-const QList<int> unexportable_type_ids = {QMetaType::UnknownType, QMetaType::QObjectStar, QMetaType::Void, QMetaType::Nullptr, QMetaType::VoidStar};
+Q_GLOBAL_STATIC_WITH_ARGS(QList<int>, unexportable_type_ids,
+                          ({QMetaType::UnknownType, QMetaType::QObjectStar, QMetaType::Void, QMetaType::Nullptr, QMetaType::VoidStar}));
 
 QByteArray ModuleObject::exportToBin(bool auto_ignore) const
 {
@@ -817,9 +818,9 @@ QByteArray ModuleObject::exportToBin(bool auto_ignore) const
     //variant
     uchar cond = BIN_NULL;
     QVariant var = get();
-    if (var.isNull() || unexportable_type_ids.contains(var.type())) {
+    if (var.isNull() || unexportable_type_ids()->contains(var.type())) {
         out_stream << cond;
-    } else if (var.type() >= QMetaType::User) {
+    } else if (var.type() >= QVariant::UserType) {
         cond = BIN_CUSTOM;
         QString type_name = var.typeName();
         int type_id = QMetaType::type(var.typeName());
