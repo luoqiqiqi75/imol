@@ -596,7 +596,7 @@ void NetworkHandle::writeToSocket(const QByteArray &bytes)
 //! NetworkObject
 NetworkObject::NetworkObject(NetworkHandle::NetworkType net_type, QThread *handle_thread, const NetworkChannel &channel,
                              QAbstractSocket *handle_socket, QObject *parent) : QObject(parent),
-    m_handle(new NetworkHandle(net_type, handle_socket, channel, this))
+    m_handle(new NetworkHandle(net_type, handle_socket, channel))
 {
     QThread *target_handle_thread = (handle_thread == nullptr ? QCoreApplication::instance()->thread() : handle_thread);
     m_handle->moveToThread(target_handle_thread);
@@ -606,6 +606,11 @@ NetworkObject::NetworkObject(NetworkHandle::NetworkType net_type, QThread *handl
 
     connect(this, &NetworkObject::sendRaw, m_handle, &NetworkHandle::onSendRaw);
     connect(this, &NetworkObject::sendFilePackage, m_handle, &NetworkHandle::onSendFilePackage);
+}
+
+NetworkObject::~NetworkObject()
+{
+    m_handle->deleteLater();
 }
 
 //! NetworkManager
