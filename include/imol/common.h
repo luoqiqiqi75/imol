@@ -12,11 +12,8 @@
 #include "creatormanager.h"
 
 namespace imol {
-// version control
+//version control
 typedef CreatorManager<int, int(void)> VersionManager;
-
-// debug control
-CORESHARED_EXPORT bool isDebug();
 }
 
 /**

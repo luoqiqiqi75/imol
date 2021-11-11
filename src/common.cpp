@@ -4,10 +4,6 @@
 
 IMOL_VER_REG("imol.core", 13)
 
-namespace imol {
-bool isDebug() { return license().item("debug").toBool(); }
-}
-
 imol::VersionManager &ver()
 {
     return IMOL_CREATOR(int, (void));
