@@ -79,7 +79,7 @@ void ModuleObject::setPmobj(ModuleObject *parent_mobj)
 
 int ModuleObject::indexOfRname(const QString &rname)
 {
-    if (!rname.startsWith(IMOL_MODULE_ID_START)) return -1;
+    if (rname.isEmpty() || rname[0] != QChar(IMOL_MODULE_ID_START[0])) return -1;
 
     bool is_int = false;
     int index = rname.midRef(1).toInt(&is_int);
@@ -88,8 +88,9 @@ int ModuleObject::indexOfRname(const QString &rname)
 
 ModuleObject * ModuleObject::cmobj(const QString &child_name, bool is_strict) const
 {
+    if (is_strict) return m_cmobjs.value(child_name, m().emptyMobj());
     int index = indexOfRname(child_name);
-    return (!is_strict && index >= 0) ? cmobj(index) : m_cmobjs.value(child_name, m().emptyMobj());
+    return index >= 0 ? cmobj(index) : m_cmobjs.value(child_name, m().emptyMobj());
 }
 
 ModuleObject * ModuleObject::c(const QString &child_name, bool is_strict) const
@@ -115,7 +116,7 @@ bool ModuleObject::hasCmobj(const QString &child_name, bool is_strict) const
 
 bool ModuleObject::hasCmobj(ModuleObject *child_mobj) const
 {
-    return std::find(m_cmobjs.cbegin(), m_cmobjs.cend(), child_mobj) != m_cmobjs.cend();
+    return hasCmobj(child_mobj->name(), true);/*  std::find(m_cmobjs.cbegin(), m_cmobjs.cend(), child_mobj) != m_cmobjs.cend();*/
 }
 
 ModuleObject * ModuleObject::first() const
@@ -315,15 +316,17 @@ ModuleObject * ModuleObject::set(QObject *context, const QString &relative_name,
 
 bool ModuleObject::insert(QObject *context, ModuleObject *cmobj, bool auto_replace, int index)
 {
+    QString mobj_name = cmobj->name();
+
     if (!cmobj || cmobj->isEmptyMobj()) {
         ELOG << "<mobj>" << "attempt to insert a null module obj";
         return false;
-    } else if (hasCmobj(cmobj->name())) {
+    } else if (hasCmobj(mobj_name, true)) {
         if (!auto_replace) {
             ELOG << "<mobj>" << "attempt to insert an existed module obj: " << cmobj->name();
             return false;
         }
-        if (!remove(context, cmobj->name())) return false;
+        if (!remove(context, mobj_name)) return false;
     }
     cmobj->setPmobj(this);
     cmobj->watch(isWatching());
@@ -332,14 +335,15 @@ bool ModuleObject::insert(QObject *context, ModuleObject *cmobj, bool auto_repla
 
     m_mutex->lock();
     if (index < 0 || index >= m_cmobj_names.size()) {
-        m_cmobj_names.append(cmobj->name());
+        m_cmobj_names.append(mobj_name);
+        index = m_cmobj_names.size() - 1;
     } else {
-        m_cmobj_names.insert(index, cmobj->name());
+        m_cmobj_names.insert(index, mobj_name);
     }
-    m_cmobjs.insert(cmobj->name(), cmobj);
+    m_cmobjs.insert(mobj_name, cmobj);
     m_mutex->unlock();
 
-    if (!isQuiet()) emit added(cmobj->rname(), context);
+    if (!isQuiet()) emit added(mobj_name.startsWith(IMOL_MODULE_ID_START) ? mIndex(index) : mobj_name, context);
     if (isWatching()) activate(context, cmobj, MOBJ_INSERT);
 
     return true;
@@ -457,57 +461,62 @@ void ModuleObject::dump(ModuleObject *rmobj) const
 
 void ModuleObject::importFromJson(QObject *context, const QJsonValue &json_value, bool auto_insert, bool auto_replace, bool auto_remove)
 {
-    //set var from json
-    if (!json_value.isObject() && !json_value.isArray()) {
-        if (auto_replace) {
-            if (auto_remove) {
-                foreach (ModuleObject *child_mobj, cmobjs()) {
-                    remove(context, child_mobj);
-                }
-            }
-            set(context, json_value.toVariant());
-        }
-        return;
-    }
-
-    //build children
-    QJsonArray json_array = json_value.toArray();
-    QJsonObject json_obj = json_value.toObject();
-
-    QStringList json_keys;
     if (json_value.isArray()) {
-        for (int i = 0; i < json_array.size(); ++i) {
-            json_keys.append(mIndex(i));
+        QJsonArray json_array = json_value.toArray();
+
+        // remove control
+        if (auto_remove) {
+            while (cmobjCount() > json_array.size()) {
+                remove(context, last());
+            }
+        }
+
+        // insert control
+        if (auto_insert) {
+            while (cmobjCount() < json_array.size()) {
+                append(context);
+            }
+        }
+
+        // cmobj
+        for (int i = 0; i < json_array.size(); i++) {
+            cmobj(i)->importFromJson(context, json_array.at(i), auto_insert, auto_replace, auto_remove);
+        }
+    } else if (json_value.isObject()) {
+        QJsonObject json_obj = json_value.toObject();
+
+        // remove control
+        if (auto_remove) {
+            for (const QString& key : m_cmobj_names) {
+                if (!json_obj.contains(key)) remove(context, key);
+            }
+        }
+
+        // insert control
+        if (auto_insert) {
+            for (const QString& key : json_obj.keys()) {
+                if (!hasCmobj(key)) insert(context, key, auto_replace);
+            }
+        }
+
+        // cmobj
+        for (const QString& key : json_obj.keys()) {
+            cmobj(key)->importFromJson(context, json_obj.value(key), auto_insert, auto_replace, auto_remove);
         }
     } else {
-        json_keys = json_obj.keys();
-    }
+        // replace control
+        if (!auto_replace) return;
 
-    //auto remove
-    if (auto_remove) {
-        int cnt = cmobjCount();
-        for (int i = 0; i < cnt; ++i) {
-            ModuleObject *child_mobj = cmobj(cnt - i - 1);
-            if (!json_keys.contains(child_mobj->rname())) remove(context, child_mobj);
-        }
-    }
-
-    for (int i = 0; i < json_keys.size(); i++) {
-        QString json_key = json_keys.at(i);
-        if (json_key.contains(IMOL_MODULE_NAME_SEPARATOR)) WLOG << "<m><" << context << "> importing json key contains separator: \"" << json_key << "\"";
-
-        //auto insert
-        if (!hasCmobj(json_key)) {
-            if (!auto_insert) {
-                WLOG << "<m><" << context << "> importing json key not exist: \"" << json_key << "\"";
-                continue;
+        // remove control
+        if (auto_remove) {
+            for (ModuleObject *child_mobj : cmobjs()) {
+                remove(context, child_mobj);
             }
-
-            if (!insert(context, json_key, auto_replace)) continue;
         }
 
-        //replace
-        cmobj(json_key)->importFromJson(context, json_value.isArray() ? json_array.at(i) : json_obj.value(json_key), auto_insert, auto_replace, auto_remove);
+        // data
+        set(context, json_value.toVariant());
+        return;
     }
 
     //emit signal
