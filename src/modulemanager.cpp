@@ -20,123 +20,50 @@ using namespace imol;
 //!
 //! ModuleObject implementation
 //!
-ModuleObject::ModuleObject(const QString &name, ModuleObject *parent_mobj) : QObject(nullptr),
-    m_pmobj(parent_mobj),
+ModuleObject::ModuleObject(const QString &name, ModuleObject *pmobj) : QObject(nullptr),
+    m_pmobj(pmobj),
     m_name(name),
     m_is_quiet(false),
     m_is_watching(false),
     m_mutex(new QMutex)
 {
+    m_prev_bmobj = m_next_bmobj = nullptr;
+    m_first_cmobj = m_last_cmobj = nullptr;
 }
 
 ModuleObject::~ModuleObject()
 {
-//    for (imol::ModuleObject *child_mobj : cmobjs()) {
-//        remove(this, child_mobj);
-//    }
     qDeleteAll(m_cmobjs);
     delete m_mutex;
 }
 
-bool ModuleObject::isEmptyMobj() const
-{
-    return false;
-}
+bool ModuleObject::isEmptyMobj() const { return false; }
 
+QString ModuleObject::name() const { return m_name; }
+
+bool ModuleObject::isQuiet() const { return m_is_quiet; }
 void ModuleObject::quiet(bool is_quiet, bool is_recursively)
 {
     m_is_quiet = is_quiet;
-    if (is_recursively) foreach (ModuleObject *mobj, cmobjs()) mobj->quiet(is_quiet, true);
+    if (is_recursively) foreach (auto mobj, m_cmobjs) mobj->quiet(is_quiet, true);
 }
 
+bool ModuleObject::isWatching() const { return m_is_watching; }
 void ModuleObject::watch(bool is_watching, bool is_recursively)
 {
     m_is_watching = is_watching;
-    if (is_recursively) foreach (ModuleObject *mobj, cmobjs()) mobj->watch(is_watching, true);
+    if (is_recursively) foreach (auto mobj, m_cmobjs) mobj->watch(is_watching, true);
 }
 
-ModuleObject * ModuleObject::pmobj() const
-{
-    return m_pmobj ? m_pmobj : m().emptyMobj();
-}
-
-ModuleObject * ModuleObject::pmobj(int level) const
-{
-    return m_pmobj ? (level > 0 ? m_pmobj->pmobj(level - 1) : m_pmobj) : m().emptyMobj();
-}
-
-ModuleObject * ModuleObject::p(int level) const
-{
-    return level == 0 ? pmobj() : pmobj(level);
-}
-
-void ModuleObject::setPmobj(ModuleObject *parent_mobj)
-{
-    m_mutex->lock();
-    m_pmobj = parent_mobj;
-    m_mutex->unlock();
-}
+bool isStrictName(const QString &name) { return name.isEmpty() || name[0] != IMOL_MODULE_ID_START[0]; }
 
 int ModuleObject::indexOfRname(const QString &rname)
 {
-    if (rname.isEmpty() || rname[0] != QChar(IMOL_MODULE_ID_START[0])) return -1;
+    if (isStrictName(rname)) return -1;
 
     bool is_int = false;
     int index = rname.midRef(1).toInt(&is_int);
     return is_int ? index : -1;
-}
-
-ModuleObject * ModuleObject::cmobj(const QString &child_name, bool is_strict) const
-{
-    if (is_strict) return m_cmobjs.value(child_name, m().emptyMobj());
-    int index = indexOfRname(child_name);
-    return index >= 0 ? cmobj(index) : m_cmobjs.value(child_name, m().emptyMobj());
-}
-
-ModuleObject * ModuleObject::c(const QString &child_name, bool is_strict) const
-{
-    return cmobj(child_name, is_strict);
-}
-
-ModuleObject * ModuleObject::cmobj(int index) const
-{
-    QString cmobj_name = m_cmobj_names.value(index, "");
-    return cmobj_name.isEmpty() ? m().emptyMobj() : cmobj(cmobj_name);
-}
-
-ModuleObject * ModuleObject::c(int index) const
-{
-    return cmobj(index);
-}
-
-bool ModuleObject::hasCmobj(const QString &child_name, bool is_strict) const
-{
-    return child_name.isEmpty() ? !m_cmobjs.isEmpty() : !cmobj(child_name, is_strict)->isEmptyMobj();
-}
-
-bool ModuleObject::hasCmobj(ModuleObject *child_mobj) const
-{
-    return hasCmobj(child_mobj->name(), true);/*  std::find(m_cmobjs.cbegin(), m_cmobjs.cend(), child_mobj) != m_cmobjs.cend();*/
-}
-
-ModuleObject * ModuleObject::first() const
-{
-    return cmobj(0);
-}
-
-ModuleObject * ModuleObject::last() const
-{
-    return cmobj(cmobjCount() - 1);
-}
-
-int ModuleObject::cmobjCount() const
-{
-    return m_cmobjs.size();
-}
-
-int ModuleObject::size() const
-{
-    return cmobjCount();
 }
 
 QString ModuleObject::generateId(ModuleObject *mobj)
@@ -150,58 +77,85 @@ QString ModuleObject::generateId(ModuleObject *mobj)
     return QString("%1_%2").arg(id).arg(n);
 }
 
+ModuleObject * ModuleObject::pmobj() const
+{ auto mobj = m_pmobj; return mobj ? mobj : m().emptyMobj(); }
+ModuleObject * ModuleObject::pmobj(int level) const
+{ return m_pmobj ? (level > 0 ? m_pmobj->pmobj(level - 1) : m_pmobj) : m().emptyMobj(); }
+ModuleObject * ModuleObject::p(int level) const { return pmobj(level); }
+
+ModuleObject * ModuleObject::prevBmobj() const
+{ auto mobj = m_prev_bmobj; return mobj ? mobj : m().emptyMobj(); }
+ModuleObject * ModuleObject::nextBmobj() const
+{ auto mobj = m_next_bmobj; return mobj ? mobj : m().emptyMobj(); }
+ModuleObject * ModuleObject::bmobj(int next) const
+{
+    ModuleObject *mobj = const_cast<ModuleObject*>(this);
+    if (next > 0) {
+        for (int i = 0; i < next && !mobj->isEmptyMobj(); i++) mobj = mobj->nextBmobj();
+    } else if (next < 0) {
+        for (int i = 0; i < - next && !mobj->isEmptyMobj(); i++) mobj = mobj->prevBmobj();
+    }
+    return mobj;
+}
+ModuleObject * ModuleObject::b(int next) const { return bmobj(next); }
+
 int ModuleObject::indexInPmobj() const
 {
-    return pmobj()->isEmptyMobj() ? -1 : pmobj()->cmobjs(true).indexOf(const_cast<ModuleObject *>(this));
+    if (pmobj()->isEmptyMobj()) return -1;
+    ModuleObject *bmobj = const_cast<ModuleObject*>(this);
+    int index = 0;
+    while (!(bmobj = bmobj->prevBmobj())->isEmptyMobj()) index++;
+    return index;
 }
 
-ModuleObject * ModuleObject::rmobj(const QString &relative_name) const
-{
-    ModuleObject *target_mobj = const_cast<ModuleObject *>(this);
-    QStringList mobj_names = relative_name.split(IMOL_MODULE_NAME_SEPARATOR);
-    foreach (QString mobj_name, mobj_names) {
-        if ((target_mobj = target_mobj->cmobj(mobj_name))->isEmptyMobj()) return m().emptyMobj();
-    }
-    return target_mobj;
-}
+bool ModuleObject::isRelative() const { return !isStrictName(m_name); }
 
-ModuleObject * ModuleObject::r(const QString &relative_name) const
-{
-    return rmobj(relative_name);
-}
+QString ModuleObject::rname() const { return isStrictName(m_name) ? m_name : mIndex(indexInPmobj(), m_name); }
 
-bool ModuleObject::hasRmobj(const QString &relative_name) const
+ModuleObject * ModuleObject::cmobj(const QString &rname, bool is_strict) const
 {
-    return !rmobj(relative_name)->isEmptyMobj();
+    if (is_strict) return m_cmobjs.value(rname, m().emptyMobj());
+    int index = indexOfRname(rname);
+    return index >= 0 ? cmobj(index) : m_cmobjs.value(rname, m().emptyMobj());
 }
+ModuleObject * ModuleObject::c(const QString &rname, bool is_strict) const { return cmobj(rname, is_strict); }
+ModuleObject * ModuleObject::cmobj(int index) const
+{
+    int s = m_cmobjs.size();
+    if (index >= s || index < -s) return m().emptyMobj();
+    if (index > s / 2) return last()->bmobj(index + 1 - s);
+    if (index >= 0) return first()->bmobj(index);
+    if (index > -s / 2) return last()->bmobj(index + 1);
+    return first()->bmobj(s + index);
+}
+ModuleObject * ModuleObject::c(int index) const { return cmobj(index); }
 
-bool ModuleObject::isRmobjOf(ModuleObject *ancestral_mobj) const
+bool ModuleObject::hasCmobj(const QString &rname, bool is_strict) const
 {
-    return pmobj()->isEmptyMobj() ? false : (pmobj() == ancestral_mobj ? true : pmobj()->isRmobjOf(ancestral_mobj));
+    if (rname.isEmpty()) return !m_cmobjs.isEmpty();
+    if (is_strict) return m_cmobjs.contains(rname);
+    int index = indexOfRname(rname);
+    return index < 0 ? m_cmobjs.contains(rname) : index < m_cmobjs.size();
 }
+bool ModuleObject::hasCmobj(ModuleObject *mobj) const
+{ return m_cmobjs.contains(mobj->name()); }
 
-QString ModuleObject::rname() const
-{
-    return name().startsWith(IMOL_MODULE_ID_START) ? mIndex(indexInPmobj(), name()) : name();
-}
+ModuleObject * ModuleObject::first() const
+{ auto mobj = m_first_cmobj; return mobj ? mobj : m().emptyMobj(); }
+ModuleObject * ModuleObject::last() const
+{ auto mobj = m_last_cmobj; return mobj ? mobj : m().emptyMobj(); }
 
-QString ModuleObject::fullName(ModuleObject *relative_mobj) const
-{
-    ModuleObject *mobj = pmobj();
-    ModuleObject *rmobj = relative_mobj ? relative_mobj : m().rootMobj();
-    return (mobj->isEmptyMobj() || mobj == rmobj) ? rname() : mName(mobj->fullName(relative_mobj), rname());
-}
+int ModuleObject::cmobjCount() const { return m_cmobjs.size(); }
+int ModuleObject::size() const { return m_cmobjs.size(); }
 
 QStringList ModuleObject::cmobjNames(bool is_strict) const
 {
-    if (is_strict) return m_cmobj_names;
-
-    //replace with mIndex
+    int cnt = 0;
     QStringList names;
     m_mutex->lock();
-    for (int i = 0; i < m_cmobj_names.size(); ++i) {
-        QString cmobj_name = m_cmobj_names.value(i, "");
-        names.append(cmobj_name.startsWith(IMOL_MODULE_ID_START) ? mIndex(i) : cmobj_name);
+    for (ModuleObject *mobj = first(); !mobj->isEmptyMobj(); mobj = mobj->nextBmobj()) {
+        names.append(!is_strict && mobj->isRelative() ? mIndex(cnt) : mobj->name());
+        cnt++;
     }
     m_mutex->unlock();
     return names;
@@ -212,10 +166,34 @@ QList<ModuleObject *> ModuleObject::cmobjs(bool is_ordered) const
     if (!is_ordered) return m_cmobjs.values();
 
     QList<ModuleObject *> mobjs;
-    foreach (QString mobj_name, cmobjNames(true)) {
-        mobjs.append(cmobj(mobj_name, true));
+    m_mutex->lock();
+    for (ModuleObject *mobj = first(); !mobj->isEmptyMobj(); mobj = mobj->nextBmobj()) {
+        mobjs.append(mobj);
     }
+    m_mutex->unlock();
     return mobjs;
+}
+
+ModuleObject * ModuleObject::rmobj(const QString &rpath) const
+{
+    ModuleObject *tar_mobj = const_cast<ModuleObject *>(this);
+    foreach (const QString &name, rpath.split(IMOL_MODULE_NAME_SEPARATOR)) {
+        if ((tar_mobj = tar_mobj->cmobj(name))->isEmptyMobj()) return m().emptyMobj();
+    }
+    return tar_mobj;
+}
+ModuleObject * ModuleObject::r(const QString &rpath) const { return rmobj(rpath); }
+
+bool ModuleObject::hasRmobj(const QString &rpath) const
+{ return !rmobj(rpath)->isEmptyMobj(); }
+bool ModuleObject::isRmobjOf(ModuleObject *mobj) const
+{ return pmobj()->isEmptyMobj() ? false : (pmobj() == mobj ? true : pmobj()->isRmobjOf(mobj)); }
+
+QString ModuleObject::fullName(ModuleObject *ancestral_mobj) const
+{
+    ModuleObject *mobj = pmobj();
+    ModuleObject *rmobj = ancestral_mobj ? ancestral_mobj : m().rootMobj();
+    return (mobj->isEmptyMobj() || mobj == rmobj) ? rname() : mName(mobj->fullName(ancestral_mobj), rname());
 }
 
 void ModuleObject::activate(QObject *context, ModuleObject *changed_mobj, ActivateType type)
@@ -260,23 +238,23 @@ QString ModuleObject::getString(const QString &default_str) const
 QVariantList ModuleObject::getList() const
 {
     QVariantList list;
-    foreach (ModuleObject *child_mobj, cmobjs(true)) {
-        list.append(child_mobj->get());
+    foreach (ModuleObject *mobj, cmobjs(true)) {
+        list.append(mobj->get());
     }
     return list;
 }
 
-void ModuleObject::setList(QObject *context, const QVariantList &var_list, bool intelligent)
+void ModuleObject::setList(QObject *context, const QVariantList &vars, bool intelligent)
 {
-    for (int i = 0; i < var_list.size(); ++i) {
-        set(context, mIndex(i), var_list.at(i), intelligent);
+    for (int i = 0; i < vars.size(); ++i) {
+        set(context, mIndex(i), vars.at(i), intelligent);
     }
 }
 
-void ModuleObject::setList(QObject *context, const QString &relative_name, const QVariantList &var_list, bool intelligent)
+void ModuleObject::setList(QObject *context, const QString &rpath, const QVariantList &vars, bool intelligent)
 {
-    for (int i = 0; i < var_list.size(); ++i) {
-        set(context, mName(relative_name, mIndex(i)), var_list.at(i), intelligent);
+    for (int i = 0; i < vars.size(); ++i) {
+        set(context, mName(rpath, mIndex(i)), vars.at(i), intelligent);
     }
 }
 
@@ -284,132 +262,166 @@ ModuleObject * ModuleObject::set(QObject *context, const QVariant &var)
 {
     QVariant tmp_var = var;
 
-    m_mutex->lock();
     m_var.swap(tmp_var);
-    m_mutex->unlock();
 
     //emit signal
     if (!isQuiet()) emit changed(m_var, tmp_var, context);
     if (isWatching()) activate(context, this, MOBJ_CHANGE);
 
-    tmp_var.clear();
-
     return this;
 }
 
-ModuleObject * ModuleObject::set(QObject *context, const QString &relative_name, const QVariant &var, bool intelligent)
+ModuleObject * ModuleObject::set(QObject *context, const QString &rpath, const QVariant &var, bool intelligent)
 {
-    ModuleObject *target_mobj = rmobj(relative_name);
+    ModuleObject *tar_mobj = rmobj(rpath);
 
     //need insert
-    if (target_mobj->isEmptyMobj() && intelligent) {
-        insert(context, relative_name);
-        target_mobj = rmobj(relative_name);
+    if (tar_mobj->isEmptyMobj() && intelligent) {
+        insert(context, rpath);
+        tar_mobj = rmobj(rpath);
     }
 
     //normal set
-    if (target_mobj->isEmptyMobj()) WLOG << "<m><" << context << "> set unreachable module: \"" << relative_name << "\" with: " << var;
-    target_mobj->set(context, var);
+    if (tar_mobj->isEmptyMobj()) WLOG << "<m><" << context << "> set unreachable module: \"" << rpath << "\" with: " << var;
+
+    tar_mobj->set(context, var);
 
     return this;
 }
 
-bool ModuleObject::insert(QObject *context, ModuleObject *cmobj, bool auto_replace, int index)
+bool ModuleObject::insert(QObject *context, ModuleObject *mobj, bool auto_replace, int index)
 {
-    QString mobj_name = cmobj->name();
-
-    if (!cmobj || cmobj->isEmptyMobj()) {
-        ELOG << "<mobj>" << "attempt to insert a null module obj";
+    if (!mobj || mobj->isEmptyMobj()) {
+        ESLOG << "<mobj><" << context << "> attempt to insert a null module obj";
         return false;
-    } else if (hasCmobj(mobj_name, true)) {
+    }
+
+    if (hasCmobj(mobj->name(), true)) {
         if (!auto_replace) {
-            ELOG << "<mobj>" << "attempt to insert an existed module obj: " << cmobj->name();
+            ESLOG << "<mobj><" << context << "> attempt to insert an existed module obj: " << mobj->name();
             return false;
         }
-        if (!remove(context, mobj_name)) return false;
+        if (!remove(context, mobj->name())) return false;
     }
-    cmobj->setPmobj(this);
-    cmobj->watch(isWatching());
 
-    if (!isQuiet()) emit gonnaInsert(cmobj, this, context);
+    if (!isQuiet()) emit gonnaInsert(mobj, this, context);
 
     m_mutex->lock();
-    if (index < 0 || index >= m_cmobj_names.size()) {
-        m_cmobj_names.append(mobj_name);
-        index = m_cmobj_names.size() - 1;
-    } else {
-        m_cmobj_names.insert(index, mobj_name);
+
+    mobj->setPmobj(this);
+    mobj->watch(isWatching());
+    mobj->setPrevBmobj(nullptr);
+    mobj->setNextBmobj(nullptr);
+
+    if (index < 0 || index > size()) index = size();
+    if (!m_first_cmobj) { // size == 0, index == 0
+        m_first_cmobj = mobj;
+        m_last_cmobj = mobj;
+    } else if (index == size()) { // size > 0, index === size
+        m_last_cmobj->setNextBmobj(mobj);
+        mobj->setPrevBmobj(m_last_cmobj);
+        m_last_cmobj = mobj;
+    } else { // size > 0, 0 < index < size
+        ModuleObject *prev, *next;
+        if (index < size() / 2) {
+            prev = cmobj(index - 1);
+            next = prev->nextBmobj();
+        } else {
+            next = cmobj(index - size());
+            prev = next->prevBmobj();
+        }
+        prev->setNextBmobj(mobj);
+        next->setPrevBmobj(mobj);
+        mobj->setNextBmobj(next);
+        mobj->setPrevBmobj(prev);
     }
-    m_cmobjs.insert(mobj_name, cmobj);
+
+    m_cmobjs.insert(mobj->name(), mobj);
+
     m_mutex->unlock();
 
-    if (!isQuiet()) emit added(mobj_name.startsWith(IMOL_MODULE_ID_START) ? mIndex(index) : mobj_name, context);
-    if (isWatching()) activate(context, cmobj, MOBJ_INSERT);
+    if (!isQuiet()) emit added(mobj->isRelative() ? mIndex(index) : mobj->name(), context);
+    if (isWatching()) activate(context, mobj, MOBJ_INSERT);
 
     return true;
 }
 
-bool ModuleObject::insert(QObject *context, const QString &relative_name, bool auto_replace)
+bool ModuleObject::insert(QObject *context, const QString &rpath, bool auto_replace)
 {
-    ModuleObject *target_mobj = this;
-    foreach (QString mobj_name, relative_name.split(IMOL_MODULE_NAME_SEPARATOR)) {
-        if (target_mobj->isEmptyMobj()) return false;
+    ModuleObject *tar_mobj = this;
+    foreach (const QString &rname, rpath.split(IMOL_MODULE_NAME_SEPARATOR)) {
+        if (tar_mobj->isEmptyMobj()) return false;
 
-        if (!target_mobj->hasCmobj(mobj_name)) {
-            ModuleObject *mobj = new ModuleObject(mobj_name.startsWith(IMOL_MODULE_ID_START) ? generateId(this) : mobj_name, target_mobj);
-            if (!target_mobj->insert(context, mobj, auto_replace)) {
+        if (!tar_mobj->hasCmobj(rname)) {
+            ModuleObject *mobj = m().create(isStrictName(rname) ? rname : generateId(this), tar_mobj);
+            if (!tar_mobj->insert(context, mobj, auto_replace)) {
                 delete mobj;
                 return false;
             }
         }
 
-        target_mobj = target_mobj->cmobj(mobj_name);
+        tar_mobj = tar_mobj->cmobj(rname);
     }
 
     return true;
 }
 
-ModuleObject * ModuleObject::append(QObject *context, const QString &rname)
+ModuleObject * ModuleObject::append(QObject *context, const QString &name)
 {
-    ModuleObject *mobj = new ModuleObject(rname.isEmpty() ? generateId(this) : rname, this);
-    if (!this->insert(context, mobj)) {
+    ModuleObject *mobj = m().create(name.isEmpty() ? generateId(this) : name, this);
+    if (!insert(context, mobj)) {
         delete mobj;
         return m().emptyMobj();
     }
     return mobj;
 }
 
-bool ModuleObject::remove(QObject *context, ModuleObject *cmobj, bool auto_delete)
+bool ModuleObject::remove(QObject *context, ModuleObject *mobj, bool auto_delete)
 {
-    if (!cmobj || cmobj->isEmptyMobj()) {
-        ELOG << "<mobj>" << "attempt to remove a null module obj";
-        return false;
-    } else if (!hasCmobj(cmobj->name(), true)) {
-        ELOG << "<mobj>" << "attempt to remove an unexisted module obj: " << cmobj->name();
+    if (!mobj || mobj->isEmptyMobj()) {
+        ESLOG << "<mobj><" << context << "> attempt to remove a null module obj";
         return false;
     }
-    QString mobj_name = cmobj->name();
-    QString mobj_rname = cmobj->rname();
 
-    if (!isQuiet()) emit gonnaRemove(cmobj, this, context);
+    if (!hasCmobj(mobj->name(), true)) {
+        ESLOG << "<mobj><" << context << "> attempt to remove an unexisted module obj: " << mobj->name();
+        return false;
+    }
+
+    if (!isQuiet()) emit gonnaRemove(mobj, this, context);
 
     m_mutex->lock();
-    m_cmobj_names.removeOne(mobj_name);
-    m_cmobjs.remove(mobj_name);
+
+    QString rname = mobj->isRelative() ? mIndex(mobj->indexInPmobj()) : mobj->name();
+
+    ModuleObject *prev = mobj->prevBmobj()->isEmptyMobj() ? nullptr : mobj->prevBmobj();
+    ModuleObject *next = mobj->nextBmobj()->isEmptyMobj() ? nullptr : mobj->nextBmobj();
+
+    if (m_first_cmobj == mobj) m_first_cmobj = next;
+    if (m_last_cmobj == mobj) m_last_cmobj = prev;
+
+    if (prev) prev->setNextBmobj(next);
+    if (next) next->setPrevBmobj(prev);
+
+    mobj->setPrevBmobj(nullptr);
+    mobj->setNextBmobj(nullptr);
+
+    m_cmobjs.remove(mobj->name());
+
     m_mutex->unlock();
 
-    if (!isQuiet()) emit removed(mobj_rname, context);
-    if (isWatching()) activate(context, cmobj, MOBJ_REMOVE);
+    if (!isQuiet()) emit removed(rname, context);
+    if (isWatching()) activate(context, mobj, MOBJ_REMOVE);
 
-    if (auto_delete) delete cmobj;
+    if (auto_delete) delete mobj;
 
     return true;
 }
 
-bool ModuleObject::remove(QObject *context, const QString &relative_name, bool auto_delete)
+bool ModuleObject::remove(QObject *context, const QString &rpath, bool auto_delete)
 {
-    ModuleObject *target_mobj = rmobj(relative_name);
-    return target_mobj->pmobj()->remove(context, target_mobj, auto_delete);
+    ModuleObject *tar_mobj = rmobj(rpath);
+    return tar_mobj->pmobj()->remove(context, tar_mobj, auto_delete);
 }
 
 void ModuleObject::copyFrom(QObject *context, ModuleObject *other, bool auto_insert, bool auto_remove)
@@ -418,17 +430,15 @@ void ModuleObject::copyFrom(QObject *context, ModuleObject *other, bool auto_ins
 
     //auto remove
     if (auto_remove) {
-        int cnt = cmobjCount();
-        for (int i = 0; i < cnt; ++i) {
-            ModuleObject *child_mobj = cmobj(cnt - i - 1);
-            if (!other->hasCmobj(child_mobj->rname())) remove(context, child_mobj);
+        foreach (ModuleObject *mobj, m_cmobjs) {
+            if (!other->hasCmobj(mobj->rname())) remove(context, mobj);
         }
     }
 
     //auto insert
-    foreach (QString cmobj_name, other->cmobjNames()) {
-        if (!hasCmobj(cmobj_name) && auto_insert && !insert(context, cmobj_name)) continue;
-        cmobj(cmobj_name)->copyFrom(context, other->cmobj(cmobj_name), auto_insert, auto_remove);
+    foreach (const QString &rname, other->cmobjNames()) {
+        if (!hasCmobj(rname) && auto_insert && !insert(context, rname)) continue;
+        cmobj(rname)->copyFrom(context, other->cmobj(rname), auto_insert, auto_remove);
     }
 
     set(context, other->get());
@@ -438,14 +448,14 @@ void ModuleObject::clear(QObject *context, bool auto_delete, bool only_var)
 {
     if (only_var) {
         //only clear var
-        foreach (ModuleObject *child_mobj, cmobjs()) {
-            child_mobj->clear(context, auto_delete, only_var);
+        foreach (ModuleObject *mobj, cmobjs()) {
+            mobj->clear(context, auto_delete, only_var);
         }
         set(context, QVariant());
     } else {
         //clear all cmobjs
-        foreach (ModuleObject *child_mobj, cmobjs()) {
-            remove(context, child_mobj, auto_delete);
+        foreach (ModuleObject *mobj, cmobjs()) {
+            remove(context, mobj, auto_delete);
         }
         set(context, QVariant());
     }
@@ -487,20 +497,20 @@ void ModuleObject::importFromJson(QObject *context, const QJsonValue &json_value
 
         // remove control
         if (auto_remove) {
-            for (const QString& key : m_cmobj_names) {
+            foreach (const QString& key, cmobjNames(true)) {
                 if (!json_obj.contains(key)) remove(context, key);
             }
         }
 
         // insert control
         if (auto_insert) {
-            for (const QString& key : json_obj.keys()) {
+            foreach (const QString& key, json_obj.keys()) {
                 if (!hasCmobj(key)) insert(context, key, auto_replace);
             }
         }
 
         // cmobj
-        for (const QString& key : json_obj.keys()) {
+        foreach (const QString& key, json_obj.keys()) {
             cmobj(key)->importFromJson(context, json_obj.value(key), auto_insert, auto_replace, auto_remove);
         }
     } else {
@@ -509,8 +519,8 @@ void ModuleObject::importFromJson(QObject *context, const QJsonValue &json_value
 
         // remove control
         if (auto_remove) {
-            for (ModuleObject *child_mobj : cmobjs()) {
-                remove(context, child_mobj);
+            foreach (ModuleObject *mobj, cmobjs()) {
+                remove(context, mobj);
             }
         }
 
@@ -529,7 +539,7 @@ QJsonValue ModuleObject::exportToJson(bool auto_ignore) const
     //set json from var
     if (!hasCmobj()) return QJsonValue::fromVariant(get());
 
-    if (cmobj(0)->name().startsWith(IMOL_MODULE_ID_START)) {
+    if (first()->isRelative()) {
         //build json array
         QJsonArray json_array;
         foreach (ModuleObject *mobj, cmobjs(true)) {
@@ -539,9 +549,9 @@ QJsonValue ModuleObject::exportToJson(bool auto_ignore) const
     } else {
         //build json object
         QJsonObject json_obj;
-        foreach (QString child_name, cmobjNames()) {
-            if (auto_ignore && child_name.startsWith(IMOL_MODULE_SPECIAL_START)) continue;
-            json_obj.insert(child_name, cmobj(child_name)->exportToJson());
+        foreach (const QString &name, cmobjNames(true)) {
+            if (auto_ignore && name.startsWith(IMOL_MODULE_SPECIAL_START)) continue;
+            json_obj.insert(name, cmobj(name, true)->exportToJson());
         }
         return json_obj;
     }
@@ -624,7 +634,7 @@ void ModuleObject::importFromXml(QObject *context, QXmlStreamReader &xml_reader,
 {
     QHash<ModuleObject *, int> index_hash; //save index
     QHash<ModuleObject *, QVariant> value_hash; //save value
-    for (ModuleObject *target_mobj = this; !xml_reader.atEnd() && target_mobj != pmobj(); xml_reader.readNext()) {
+    for (ModuleObject *tar_mobj = this; !xml_reader.atEnd() && tar_mobj != pmobj(); xml_reader.readNext()) {
         if (xml_reader.isStartElement()) {
             QXmlStreamAttributes attrs = xml_reader.attributes();
 
@@ -662,7 +672,7 @@ void ModuleObject::importFromXml(QObject *context, QXmlStreamReader &xml_reader,
                 }
                 cmobj_name = QString().append(name_ref);
             } else if (xml_reader.name() == "l") {
-                cmobj_name = mIndex(index_hash.value(target_mobj, 0));
+                cmobj_name = mIndex(index_hash.value(tar_mobj, 0));
             } else {
                 cmobj_name = QString().append(xml_reader.name());
 
@@ -674,36 +684,36 @@ void ModuleObject::importFromXml(QObject *context, QXmlStreamReader &xml_reader,
             }
 
             //create cmobj
-            if (!target_mobj->hasCmobj(cmobj_name)) {
+            if (!tar_mobj->hasCmobj(cmobj_name)) {
                 if (!auto_insert) {
                     WLOG << "<m><" << context << "> importing xml element not exist: \"" << cmobj_name << "\"";
                     xml_reader.skipCurrentElement();
                     continue;
-                } else if (!target_mobj->insert(context, cmobj_name, auto_replace)) {
+                } else if (!tar_mobj->insert(context, cmobj_name, auto_replace)) {
                     xml_reader.skipCurrentElement();
                     continue;
                 }
             }
 
             //record index
-            index_hash[target_mobj] = index_hash.value(target_mobj, 0) + 1;
+            index_hash[tar_mobj] = index_hash.value(tar_mobj, 0) + 1;
 
             //insert child and set value
-            target_mobj = target_mobj->cmobj(cmobj_name);
-            if (auto_replace) value_hash[target_mobj] = value_var;
+            tar_mobj = tar_mobj->cmobj(cmobj_name);
+            if (auto_replace) value_hash[tar_mobj] = value_var;
         } else if (xml_reader.isEndElement()) {
             //finish cur item
-            if (auto_replace) target_mobj->set(context, value_hash.value(target_mobj, QVariant()));
+            if (auto_replace) tar_mobj->set(context, value_hash.value(tar_mobj, QVariant()));
 
-            index_hash.remove(target_mobj);
-            value_hash.remove(target_mobj);
+            index_hash.remove(tar_mobj);
+            value_hash.remove(tar_mobj);
 
-            target_mobj = target_mobj->pmobj();
+            tar_mobj = tar_mobj->pmobj();
         }
     }
 
     //emit signal
-    if (!isQuiet()) emit changed(m_var, m_var, context);
+    if (!isQuiet()) emit changed(get(), get(), context);
     if (isWatching()) activate(context, this, MOBJ_CHANGE);
 }
 
@@ -721,7 +731,7 @@ void ModuleObject::exportToXml(QXmlStreamWriter &xml_writer, bool is_root, bool 
     }
 
     //write cmobj
-    foreach (imol::ModuleObject *cmobj, cmobjs(true)) {
+    foreach (ModuleObject *cmobj, cmobjs(true)) {
         if (auto_ignore && cmobj->name().startsWith(IMOL_MODULE_SPECIAL_START)) continue;
         cmobj->exportToXml(xml_writer, false, auto_ignore);
     }
@@ -811,7 +821,7 @@ void ModuleObject::importFromBin(QObject *context, const QByteArray &bytes, bool
         set(context, var);
     } else {
         //emit signal
-        if (!isQuiet()) emit changed(m_var, m_var, context);
+        if (!isQuiet()) emit changed(get(), get(), context);
         if (isWatching()) activate(context, this, MOBJ_CHANGE);
     }
 }
@@ -841,54 +851,58 @@ QByteArray ModuleObject::exportToBin(bool auto_ignore) const
 
     //cmobjs
     QStringList cmobj_names;
-    foreach (imol::ModuleObject *cmobj, cmobjs(true)) {
+    foreach (ModuleObject *cmobj, cmobjs(true)) {
         if (auto_ignore && cmobj->name().startsWith(IMOL_MODULE_SPECIAL_START)) continue;
         cmobj_names << cmobj->rname();
     }
     out_stream << cmobj_names;
 
-    foreach (imol::ModuleObject *cmobj, cmobjs(true)) {
+    foreach (ModuleObject *cmobj, cmobjs(true)) {
         if (auto_ignore && cmobj->name().startsWith(IMOL_MODULE_SPECIAL_START)) continue;
         out_stream << cmobj->exportToBin(auto_ignore);
     }
     return bytes;
 }
 
-void ModuleObject::trigger()
-{
-    set(sender(), get());
-}
+void ModuleObject::trigger() { set(sender(), get()); }
+
+void ModuleObject::setPmobj(ModuleObject *mobj) { qSwap(m_pmobj, mobj); }
+void ModuleObject::setPrevBmobj(ModuleObject *mobj) { qSwap(m_prev_bmobj, mobj); }
+void ModuleObject::setNextBmobj(ModuleObject *mobj) { qSwap(m_next_bmobj, mobj); }
 
 //!
 //! EmptyModuleObject implementation
 //!
 EmptyModuleObject::EmptyModuleObject(const QString &name, ModuleObject *parent_mobj) : ModuleObject(name, parent_mobj) {}
 
-bool EmptyModuleObject::isEmptyMobj() const {return true;}
+bool EmptyModuleObject::isEmptyMobj() const { return true; }
 
-QVariant EmptyModuleObject::get(const QVariant &) const {return QVariant();}
+QVariant EmptyModuleObject::get(const QVariant &) const { return QVariant(); }
 
-ModuleObject * EmptyModuleObject::set(QObject *, const QVariant &) {return this;}
-ModuleObject * EmptyModuleObject::set(QObject *, const QString &, const QVariant &, bool) {return this;}
+ModuleObject * EmptyModuleObject::set(QObject *, const QVariant &) { return this; }
+ModuleObject * EmptyModuleObject::set(QObject *, const QString &, const QVariant &, bool) { return this; }
 
 void EmptyModuleObject::copyFrom(QObject *, ModuleObject *, bool, bool) {}
 
-bool EmptyModuleObject::insert(QObject *, ModuleObject *, bool, int) {return false;}
-bool EmptyModuleObject::insert(QObject *, const QString &, bool) {return false;}
-ModuleObject * EmptyModuleObject::append(QObject *, const QString &) {return this;}
+bool EmptyModuleObject::insert(QObject *, ModuleObject *, bool, int) { return false; }
+bool EmptyModuleObject::insert(QObject *, const QString &, bool) { return false; }
+ModuleObject * EmptyModuleObject::append(QObject *, const QString &) { return this; }
 
-bool EmptyModuleObject::remove(QObject *, ModuleObject *, bool) {return false;}
-bool EmptyModuleObject::remove(QObject *, const QString &, bool) {return false;}
+bool EmptyModuleObject::remove(QObject *, ModuleObject *, bool) { return false; }
+bool EmptyModuleObject::remove(QObject *, const QString &, bool) { return false; }
 
 void EmptyModuleObject::importFromJson(QObject *, const QJsonValue &, bool, bool, bool) {}
-QJsonValue EmptyModuleObject::exportToJson(bool) const {return QJsonValue();}
+QJsonValue EmptyModuleObject::exportToJson(bool) const { return QJsonValue(); }
 
-void EmptyModuleObject::importFromXml(QObject *, QXmlStreamReader &, bool, bool, bool){}
+void EmptyModuleObject::importFromXml(QObject *, QXmlStreamReader &, bool, bool, bool) {}
 void EmptyModuleObject::exportToXml(QXmlStreamWriter &, bool, bool) const {}
 
 void EmptyModuleObject::importFromBin(QObject *, const QByteArray &, bool, bool, bool) {}
-QByteArray EmptyModuleObject::exportToBin(bool) const {return QByteArray();}
+QByteArray EmptyModuleObject::exportToBin(bool) const { return QByteArray(); }
 
+//!
+//! \brief The ConvertCommand class
+//!
 class ConvertCommand : public BaseCommand
 {
 public:
@@ -897,7 +911,7 @@ public:
     QString instruction() const override {return tr("Convert 1st type of data to 2nd type");}
 
 protected:
-    void run(imol::ModuleObject *mobj, const QString &param) override
+    void run(ModuleObject *mobj, const QString &param) override
     {
         Q_UNUSED(mobj)
 
@@ -908,7 +922,7 @@ protected:
             return;
         }
 
-        imol::ModuleObject temp("");
+        ModuleObject temp("");
 
         //read
         if (param.contains("-path")) {
@@ -973,7 +987,7 @@ ModuleManager::ModuleManager(QObject *parent) : QObject(parent),
 
 ModuleManager::~ModuleManager()
 {
-    delete m_root_mobj;
+    delete m_root_mobj; // keep empty
 }
 
 ModuleManager & ModuleManager::instance()
@@ -981,58 +995,48 @@ ModuleManager & ModuleManager::instance()
     static ModuleManager manager;
     return manager;
 }
+QString ModuleManager::separator() { return IMOL_MODULE_NAME_SEPARATOR; }
 
-QString ModuleManager::separator()
+ModuleObject * ModuleManager::rootMobj() const { return m_root_mobj; }
+ModuleObject * ModuleManager::emptyMobj() const { return m_empty_mobj; }
+
+void ModuleManager::reserve(int max_size)
 {
-    return IMOL_MODULE_NAME_SEPARATOR;
+    // todo
 }
 
-ModuleObject * ModuleManager::rootMobj() const
+ModuleObject * ModuleManager::create(const QString &name, ModuleObject *pmobj)
 {
-    return m_root_mobj;
-}
-
-ModuleObject * ModuleManager::emptyMobj() const
-{
-    return m_empty_mobj;
+     // todo
+    return new ModuleObject(name, pmobj);
 }
 
 ModuleObject * ModuleManager::regist(QObject *context, const QString &full_name)
-{
-    return m_root_mobj->insert(context, full_name) ? m_root_mobj->rmobj(full_name) : m_empty_mobj;
-}
+{ return m_root_mobj->insert(context, full_name) ? m_root_mobj->rmobj(full_name) : m_empty_mobj; }
 
 bool ModuleManager::cancel(QObject *context, const QString &full_name)
-{
-    return m_root_mobj->remove(context, full_name);
-}
+{ return m_root_mobj->remove(context, full_name); }
 
 bool ModuleManager::importFromJson(QObject *context, const QString &json_path, const QString &prefix, bool is_watched, bool auto_insert)
 {
-    ModuleObject *target_mobj = m(prefix);
-    if (target_mobj->isEmptyMobj()) {
-        if (!regist(context, prefix)) return false;
-        if (!(target_mobj = m(prefix))) {
-            ELOG << "<m><" << context << "> import json to null module object: \"" << prefix << "\"";
-            return false;
-        }
-    }
+    ModuleObject *tar_mobj = m(prefix);
+    if (tar_mobj->isEmptyMobj()) tar_mobj = regist(context, prefix);
 
     QJsonValue json_value = readFromJson(json_path);
     if (json_value.isNull()) WLOG << "<m><" << context << "> import empty json from: \"" << json_path << "\"";
-    target_mobj->watch(is_watched, true);
-    target_mobj->importFromJson(context, json_value, auto_insert);
+    tar_mobj->watch(is_watched, true);
+    tar_mobj->importFromJson(context, json_value, auto_insert);
     return true;
 }
 
 bool ModuleManager::exportToJson(QObject *context, const QString &full_name, const QString &json_path)
 {
-    ModuleObject *target_mobj = m(full_name);
-    if (target_mobj->isEmptyMobj()) {
+    ModuleObject *tar_mobj = m(full_name);
+    if (tar_mobj->isEmptyMobj()) {
         ELOG << "<m><" << context << "> export non-exist module: \"" << full_name << "\"";
         return false;
     }
-    return writeToJson(json_path, target_mobj->exportToJson());
+    return writeToJson(json_path, tar_mobj->exportToJson());
 }
 
 QString ModuleManager::convertToUtf8(const QByteArray &content)
@@ -1180,47 +1184,21 @@ bool ModuleManager::writeToBin(const QString &bin_path, const QByteArray &bin_by
 }
 
 //output function
-imol::ModuleManager & m()
-{
-    return ModuleManager::instance();
-}
-
-imol::ModuleObject * m(const QString &relative_name, ModuleObject *relative_mobj)
-{
-    return relative_mobj ? relative_mobj->rmobj(relative_name) : m().rootMobj()->rmobj(relative_name);
-}
+ModuleManager & m() { return ModuleManager::instance(); }
+ModuleObject * m(const QString &rpath, ModuleObject *relative_mobj)
+{ return relative_mobj ? relative_mobj->rmobj(rpath) : m().rootMobj()->rmobj(rpath); }
 
 QString mIndex(int index, const QString &default_name)
-{
-    return index < 0 ? default_name : QString("%1%2").arg(IMOL_MODULE_ID_START).arg(index);
-}
-
+{ return index < 0 ? default_name : QString("%1%2").arg(IMOL_MODULE_ID_START).arg(index); }
 QString mName(const QString &n0, const QString &n1)
-{
-    return n0 + IMOL_MODULE_NAME_SEPARATOR + n1;
-}
-
+{ return n0 + IMOL_MODULE_NAME_SEPARATOR + n1; }
 QString mName(const QString &n0, const QString &n1, const QString &n2)
-{
-    return mName(n0, n1) + IMOL_MODULE_NAME_SEPARATOR + n2;
-}
-
+{ return mName(n0, n1) + IMOL_MODULE_NAME_SEPARATOR + n2; }
 QString mName(const QString &n0, const QString &n1, const QString &n2, const QString &n3)
-{
-    return mName(n0, n1, n2) + IMOL_MODULE_NAME_SEPARATOR + n3;
-}
-
+{ return mName(n0, n1, n2) + IMOL_MODULE_NAME_SEPARATOR + n3; }
 QString mName(const QString &n0, const QString &n1, const QString &n2, const QString &n3, const QString &n4)
-{
-    return mName(n0, n1, n2, n3) + IMOL_MODULE_NAME_SEPARATOR + n4;
-}
-
+{ return mName(n0, n1, n2, n3) + IMOL_MODULE_NAME_SEPARATOR + n4; }
 QString mName(const QString &n0, const QString &n1, const QString &n2, const QString &n3, const QString &n4, const QString &n5)
-{
-    return mName(n0, n1, n2, n3, n4) + IMOL_MODULE_NAME_SEPARATOR + n5;
-}
-
+{ return mName(n0, n1, n2, n3, n4) + IMOL_MODULE_NAME_SEPARATOR + n5; }
 QString mName(const QString &n0, const QString &n1, const QString &n2, const QString &n3, const QString &n4, const QString &n5, const QString &n6)
-{
-    return mName(n0, n1, n2, n3, n4, n5) + IMOL_MODULE_NAME_SEPARATOR + n6;
-}
+{ return mName(n0, n1, n2, n3, n4, n5) + IMOL_MODULE_NAME_SEPARATOR + n6; }

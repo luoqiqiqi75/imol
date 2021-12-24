@@ -34,10 +34,17 @@
 class QMutex;
 class QXmlStreamReader;
 class QXmlStreamWriter;
+
 namespace imol {
+
 //!
-//! \brief The ModuleObject class saves a variant and controls the signals of change add remove operations. As one tree
-//! node in an object tree, a ModuleObject provides a series of methods to build and search its children.
+//! \brief The ModuleObject (\short mobj) class saves a variant and controls the signals of change add remove operations,
+//! working as one node in an data tree, a ModuleObject provides a series of methods to build and search its children.
+//!
+//! \brief The relative name (\short rname) gives two way of naming a mobj, absolute name or \def ID_START plus its index
+//! \brief The relative path (\short rpath) describes a search path of mobj tree branch, combinds all rnames with \def NAME_SEPARATOR
+//!
+//! \author LuoQi
 //!
 class CORESHARED_EXPORT ModuleObject : public QObject
 {
@@ -50,46 +57,79 @@ public:
         MOBJ_REMOVE
     };
 
-    explicit ModuleObject(const QString &name, ModuleObject *parent_mobj = nullptr);
+public:
+    explicit ModuleObject(const QString &name, ModuleObject *pmobj = nullptr);
     virtual ~ModuleObject();
+
+    //!
+    //! ---- self properties ----
+    //!
 
     virtual bool isEmptyMobj() const;
 
-    //! \property name is the first basic property for ModuleObject
-    Q_PROPERTY(QString m_name READ name)
-    QString name() const {return m_name;}
+    //! \property name is the basic property for ModuleObject
+    Q_PROPERTY(QString m_name READ name CONSTANT)
+    QString name() const;
 
-    //! \a quiet restricts all signals and activation
-    Q_PROPERTY(bool m_is_quiet READ isQuiet WRITE quiet)
-    bool isQuiet() const {return m_is_quiet;}
+    //! \property quiet restricts all signals and activation
+    Q_PROPERTY(bool m_is_quiet READ isQuiet WRITE quiet CONSTANT)
+    bool isQuiet() const;
     void quiet(bool is_quiet, bool is_recursively = false);
 
-    //! \a watch controls wether parent nodes are able to be activated
-    Q_PROPERTY(bool m_is_watching READ isWatching WRITE watch)
-    bool isWatching() const {return m_is_watching;}
+    //! \property watch controls wether parent nodes are able to be activated
+    Q_PROPERTY(bool m_is_watching READ isWatching WRITE watch CONSTANT)
+    bool isWatching() const;
     void watch(bool is_watching, bool is_recursively = false);
 
     //!
-    //! \brief Pmobj is the Abbreviation of Parent Module Object
+    //! ---- static utilities ----
     //!
-    ModuleObject * pmobj() const;
-    ModuleObject * pmobj(int level) const;
-    ModuleObject * p(int level = 0) const; //shortcut
-    void setPmobj(ModuleObject *parent_mobj);
 
+    //! the integer index of a rname string
     static int indexOfRname(const QString &rname);
 
+    //! creates the real name of a rname as an available cmobj for given mobj
+    static QString generateId(ModuleObject *mobj);
+
     //!
-    //! \brief Cmobj is the Abbreviation of Child Module Object
+    //! ---- parent module object (\short pmobj) ----
     //!
-    //! Visit the cmobj by \property name as default, or visit cmobj with \property index
+    //! \param level is pmobj iteration number
+
+    ModuleObject * pmobj() const;
+    ModuleObject * pmobj(int level) const;
+    ModuleObject * p(int level = 0) const; // shortcut
+
     //!
-    ModuleObject * cmobj(const QString &child_name, bool is_strict = false) const;
-    ModuleObject * c(const QString &child_name, bool is_strict = false) const; //shortcut
+    //! ---- brother module object (\short bmobj) ----
+    //!
+    //! \param next is next bmobj iteration number when positive, or previous bmobj if negative
+
+    ModuleObject * prevBmobj() const;
+    ModuleObject * nextBmobj() const;
+    ModuleObject * bmobj(int next) const;
+    ModuleObject * b(int next = 1) const; // shortcut
+
+    int indexInPmobj() const;
+
+    //! check whether name indicates an index
+    bool isRelative() const;
+
+    //! rname is relative name of this mobj
+    QString rname() const;
+
+    //!
+    //! ---- child module object (cmobj) ----
+    //!
+    //! \param index is normally index of rname, counting form last is possible by means of negative index
+
+    ModuleObject * cmobj(const QString &rname, bool is_strict = false) const;
+    ModuleObject * c(const QString &rname, bool is_strict = false) const; // shortcut
     ModuleObject * cmobj(int index) const;
-    ModuleObject * c(int index) const; //shortcut
-    bool hasCmobj(const QString &child_name = "", bool is_strict = false) const;
-    bool hasCmobj(ModuleObject *child_mobj) const;
+    ModuleObject * c(int index) const; // shortcut
+
+    bool hasCmobj(const QString &rname = "", bool is_strict = false) const;
+    bool hasCmobj(ModuleObject *mobj) const;
 
     ModuleObject * first() const;
     ModuleObject * last() const;
@@ -97,29 +137,25 @@ public:
     int cmobjCount() const;
     int size() const;
 
-    static QString generateId(ModuleObject *mobj);
-
-    int indexInPmobj() const;
-
-    //!
-    //! \brief Rmobj is the Abbreviation of Relative Module Object
-    //!
-    //! Relative path uses \def IMOL_MODULE_NAME_SEPARATOR to seperate cmobj \property name, however you can also visit cmobj with
-    //! \property index by useing \def IMOL_MODULE_ID_START at beginning and integer value comes next
-    //!
-    ModuleObject * rmobj(const QString &relative_name) const;
-    ModuleObject * r(const QString &relative_name) const; //shortcut
-    bool hasRmobj(const QString &relative_name) const;
-    bool isRmobjOf(ModuleObject *ancestral_mobj) const;
-
-    //! rname is the name in relative name
-    QString rname() const;
-
-    //! fullName is the opposite progress of rmobj
-    QString fullName(ModuleObject *relative_mobj = nullptr) const;
-
     QStringList cmobjNames(bool is_strict = false) const;
     QList<ModuleObject *> cmobjs(bool is_ordered = false) const;
+
+    //!
+    //! ---- relative module object (rmobj) ----
+    //!
+
+    ModuleObject * rmobj(const QString &rpath) const;
+    ModuleObject * r(const QString &rpath) const; // shortcut
+
+    bool hasRmobj(const QString &rpath) const;
+    bool isRmobjOf(ModuleObject *mobj) const;
+
+    //! fullName is the rpath from given mobj, \default nullptr stands for global root mobj
+    QString fullName(ModuleObject *relative_mobj = nullptr) const;
+
+    //!
+    //! ---- data control ----
+    //!
 
     void activate(QObject *context, ModuleObject *changed_mobj, ActivateType type);
 
@@ -133,17 +169,17 @@ public:
     QVariantList getList() const;
 
     virtual ModuleObject * set(QObject *context, const QVariant &var);
-    virtual ModuleObject * set(QObject *context, const QString &relative_name, const QVariant &var, bool intelligent = true);
+    virtual ModuleObject * set(QObject *context, const QString &rpath, const QVariant &var, bool intelligent = true);
 
-    void setList(QObject *context, const QVariantList &var_list, bool intelligent = true);
-    void setList(QObject *context, const QString &relative_name, const QVariantList &var_list, bool intelligent = true);
+    void setList(QObject *context, const QVariantList &vars, bool intelligent = true);
+    void setList(QObject *context, const QString &rpath, const QVariantList &vars, bool intelligent = true);
 
-    virtual bool insert(QObject *context, ModuleObject *cmobj, bool auto_replace = false, int index = -1);
-    virtual bool insert(QObject *context, const QString &relative_name, bool auto_replace = false);
-    virtual ModuleObject * append(QObject *context, const QString &rname = "");
+    virtual bool insert(QObject *context, ModuleObject *mobj, bool auto_replace = false, int index = -1);
+    virtual bool insert(QObject *context, const QString &rpath, bool auto_replace = false);
+    virtual ModuleObject * append(QObject *context, const QString &name = "");
 
-    virtual bool remove(QObject *context, ModuleObject *cmobj, bool auto_delete = true);
-    virtual bool remove(QObject *context, const QString &relative_name, bool auto_delete = true);
+    virtual bool remove(QObject *context, ModuleObject *mobj, bool auto_delete = true);
+    virtual bool remove(QObject *context, const QString &rpath, bool auto_delete = true);
 
     virtual void copyFrom(QObject *context, ModuleObject *other, bool auto_insert = true, bool auto_remove = false);
 
@@ -230,14 +266,27 @@ public slots:
      */
     void trigger();
 
+protected:
+    void setPmobj(ModuleObject *mobj);
+    void setPrevBmobj(ModuleObject *mobj);
+    void setNextBmobj(ModuleObject *mobj);
+
 private:
+    // parent
     ModuleObject *m_pmobj;
 
+    // brother
+    ModuleObject *m_prev_bmobj;
+    ModuleObject *m_next_bmobj;
+
+    // children
+    ModuleObject *m_first_cmobj;
+    ModuleObject *m_last_cmobj;
+    QHash<QString, ModuleObject *> m_cmobjs;
+
+    // self
     QString m_name;
     QVariant m_var;
-
-    QStringList m_cmobj_names;
-    QHash<QString, ModuleObject *> m_cmobjs;
 
     bool m_is_quiet;
     bool m_is_watching;
@@ -246,7 +295,7 @@ private:
 };
 
 //!
-//! \brief The EmptyModuleObject class is a mobj but does nothing, helps to avoid crash.
+//! \brief The EmptyModuleObject class is a mobj which does nothing, helpful for avoiding crash.
 //!
 class CORESHARED_EXPORT EmptyModuleObject : public ModuleObject
 {
@@ -260,16 +309,16 @@ public:
     QVariant get(const QVariant &default_var = QVariant()) const override;
 
     ModuleObject * set(QObject *context, const QVariant &var) override;
-    ModuleObject * set(QObject *context, const QString &relative_name, const QVariant &var, bool intelligent = true) override;
+    ModuleObject * set(QObject *context, const QString &rpath, const QVariant &var, bool intelligent = true) override;
 
     void copyFrom(QObject *context, ModuleObject *other, bool auto_insert = true, bool auto_remove = false) override;
 
-    bool insert(QObject *context, ModuleObject *child_mobj, bool auto_replace = false, int index = -1) override;
-    bool insert(QObject *context, const QString &name, bool auto_replace = false) override;
+    bool insert(QObject *context, ModuleObject *mobj, bool auto_replace = false, int index = -1) override;
+    bool insert(QObject *context, const QString &rpath, bool auto_replace = false) override;
     ModuleObject * append(QObject *context, const QString &rname = "") override;
 
-    bool remove(QObject *context, ModuleObject *child_mobj, bool auto_delete = true) override;
-    bool remove(QObject *context, const QString &name, bool auto_delete = true) override;
+    bool remove(QObject *context, ModuleObject *mobj, bool auto_delete = true) override;
+    bool remove(QObject *context, const QString &rpath, bool auto_delete = true) override;
 
     void importFromJson(QObject *context, const QJsonValue &json_value, bool auto_insert = true, bool auto_replace = true, bool auto_remove = false) override;
     QJsonValue exportToJson(bool auto_ignore = true) const override;
@@ -281,6 +330,9 @@ public:
     QByteArray exportToBin(bool auto_ignore = true) const override;
 };
 
+//!
+//! \brief The ModuleManager class is a global mobj container
+//!
 class CORESHARED_EXPORT ModuleManager : public QObject
 {
     Q_OBJECT
@@ -294,6 +346,9 @@ public:
 
     ModuleObject * rootMobj() const;
     ModuleObject * emptyMobj() const;
+
+    void reserve(int max_size);
+    ModuleObject * create(const QString &name, ModuleObject *pmobj = nullptr);
 
     ModuleObject * regist(QObject *context, const QString &full_name);
     bool cancel(QObject *context, const QString &full_name);
@@ -315,12 +370,13 @@ public:
 private:
     ModuleObject *m_root_mobj;
     EmptyModuleObject *m_empty_mobj;
+    QList<ModuleObject *> m_backup_mobjs;
 };
 }
 
 //output function
 CORESHARED_EXPORT imol::ModuleManager & m();
-CORESHARED_EXPORT imol::ModuleObject * m(const QString &relative_name, imol::ModuleObject *relative_mobj = nullptr);
+CORESHARED_EXPORT imol::ModuleObject * m(const QString &rpath, imol::ModuleObject *relative_mobj = nullptr);
 
 CORESHARED_EXPORT QString mIndex(int index, const QString &default_name = "");
 CORESHARED_EXPORT QString mName(const QString &n0, const QString &n1);
