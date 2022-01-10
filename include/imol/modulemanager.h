@@ -109,6 +109,7 @@ public:
     ModuleObject * nextBmobj() const;
     ModuleObject * bmobj(int next) const;
     ModuleObject * b(int next = 1) const; // shortcut
+    ModuleObject * b(const QString &rname, bool is_strict = false) const;
 
     int indexInPmobj() const;
 
@@ -182,6 +183,8 @@ public:
     virtual bool remove(QObject *context, const QString &rpath, bool auto_delete = true);
 
     virtual void copyFrom(QObject *context, ModuleObject *other, bool auto_insert = true, bool auto_remove = false);
+
+    bool reorder(QObject *context, int from_index, int to_index);
 
     void clear(QObject *context, bool auto_delete = true, bool only_var = false);
 
@@ -267,6 +270,7 @@ public slots:
     void trigger();
 
 protected:
+    void setName(const QString &name);
     void setPmobj(ModuleObject *mobj);
     void setPrevBmobj(ModuleObject *mobj);
     void setNextBmobj(ModuleObject *mobj);

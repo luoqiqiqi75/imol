@@ -2,7 +2,7 @@
 
 #include "licensemanager.h"
 
-IMOL_VER_REG("imol.core", 16)
+IMOL_VER_REG("imol.core", 17)
 
 imol::VersionManager &ver()
 {

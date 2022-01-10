@@ -98,6 +98,7 @@ ModuleObject * ModuleObject::bmobj(int next) const
     return mobj;
 }
 ModuleObject * ModuleObject::b(int next) const { return bmobj(next); }
+ModuleObject * ModuleObject::b(const QString &rname, bool is_strict) const { return pmobj()->cmobj(rname, is_strict); }
 
 int ModuleObject::indexInPmobj() const
 {
@@ -296,7 +297,9 @@ bool ModuleObject::insert(QObject *context, ModuleObject *mobj, bool auto_replac
         return false;
     }
 
-    if (hasCmobj(mobj->name(), true)) {
+    if (mobj->name().isEmpty()) {
+        mobj->setName(generateId(this));
+    } else if (hasCmobj(mobj->name(), true)) {
         if (!auto_replace) {
             ESLOG << "<mobj><" << context << "> attempt to insert an existed module obj: " << mobj->name();
             return false;
@@ -317,19 +320,17 @@ bool ModuleObject::insert(QObject *context, ModuleObject *mobj, bool auto_replac
     if (!m_first_cmobj) { // size == 0, index == 0
         m_first_cmobj = mobj;
         m_last_cmobj = mobj;
-    } else if (index == size()) { // size > 0, index === size
+    } else if (index == size()) { // size > 0, index == size
         m_last_cmobj->setNextBmobj(mobj);
         mobj->setPrevBmobj(m_last_cmobj);
         m_last_cmobj = mobj;
+    } else if (index == 0) { // size > 0, index == 0
+        m_first_cmobj->setPrevBmobj(mobj);
+        mobj->setNextBmobj(m_first_cmobj);
+        m_first_cmobj = mobj;
     } else { // size > 0, 0 < index < size
-        ModuleObject *prev, *next;
-        if (index < size() / 2) {
-            prev = cmobj(index - 1);
-            next = prev->nextBmobj();
-        } else {
-            next = cmobj(index - size());
-            prev = next->prevBmobj();
-        }
+        ModuleObject *prev = cmobj(index - 1); // no empty
+        ModuleObject *next = prev->nextBmobj();
         prev->setNextBmobj(mobj);
         next->setPrevBmobj(mobj);
         mobj->setNextBmobj(next);
@@ -442,6 +443,14 @@ void ModuleObject::copyFrom(QObject *context, ModuleObject *other, bool auto_ins
     }
 
     set(context, other->get());
+}
+
+bool ModuleObject::reorder(QObject *context, int from_index, int to_index)
+{
+    ModuleObject *mobj = cmobj(from_index);
+    if (mobj->isEmptyMobj() || !remove(context, mobj, false)) return false;
+    if (!insert(context, mobj, false, to_index)) return false;
+    return true;
 }
 
 void ModuleObject::clear(QObject *context, bool auto_delete, bool only_var)
@@ -866,6 +875,7 @@ QByteArray ModuleObject::exportToBin(bool auto_ignore) const
 
 void ModuleObject::trigger() { set(sender(), get()); }
 
+void ModuleObject::setName(const QString &name) { m_name = name; }
 void ModuleObject::setPmobj(ModuleObject *mobj) { qSwap(m_pmobj, mobj); }
 void ModuleObject::setPrevBmobj(ModuleObject *mobj) { qSwap(m_prev_bmobj, mobj); }
 void ModuleObject::setNextBmobj(ModuleObject *mobj) { qSwap(m_next_bmobj, mobj); }
