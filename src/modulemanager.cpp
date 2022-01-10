@@ -123,11 +123,8 @@ ModuleObject * ModuleObject::c(const QString &rname, bool is_strict) const { ret
 ModuleObject * ModuleObject::cmobj(int index) const
 {
     int s = m_cmobjs.size();
-    if (index >= s || index < -s) return m().emptyMobj();
-    if (index > s / 2) return last()->bmobj(index + 1 - s);
-    if (index >= 0) return first()->bmobj(index);
-    if (index > -s / 2) return last()->bmobj(index + 1);
-    return first()->bmobj(s + index);
+    if (index >= s || index < 0) return m().emptyMobj();
+    return (index > s / 2) ? last()->bmobj(index + 1 - s) : first()->bmobj(index);
 }
 ModuleObject * ModuleObject::c(int index) const { return cmobj(index); }
 
