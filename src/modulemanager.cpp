@@ -11,6 +11,7 @@
 #include <QXmlStreamWriter>
 #include <QUuid>
 #include <QDataStream>
+#include <QCoreApplication>
 
 #include "logmanager.h"
 #include "commandmanager.h"
@@ -151,6 +152,7 @@ QStringList ModuleObject::cmobjNames(bool is_strict) const
     int cnt = 0;
     QStringList names;
     m_mutex->lock();
+    names.reserve(size());
     for (ModuleObject *mobj = first(); !mobj->isEmptyMobj(); mobj = mobj->nextBmobj()) {
         names.append(!is_strict && mobj->isRelative() ? mIndex(cnt) : mobj->name());
         cnt++;
@@ -159,12 +161,13 @@ QStringList ModuleObject::cmobjNames(bool is_strict) const
     return names;
 }
 
-QList<ModuleObject *> ModuleObject::cmobjs(bool is_ordered) const
+QList<ModuleObject *> ModuleObject::cmobjs(bool) const
 {
-    if (!is_ordered) return m_cmobjs.values();
+//    if (!is_ordered) return m_cmobjs.values();
 
     QList<ModuleObject *> mobjs;
     m_mutex->lock();
+    mobjs.reserve(size());
     for (ModuleObject *mobj = first(); !mobj->isEmptyMobj(); mobj = mobj->nextBmobj()) {
         mobjs.append(mobj);
     }
@@ -444,9 +447,47 @@ void ModuleObject::copyFrom(QObject *context, ModuleObject *other, bool auto_ins
 
 bool ModuleObject::reorder(QObject *context, int from_index, int to_index)
 {
+    if (from_index == to_index || size() <= 1) return false;
+
     ModuleObject *mobj = cmobj(from_index);
     if (mobj->isEmptyMobj() || !remove(context, mobj, false)) return false;
     if (!insert(context, mobj, false, to_index)) return false;
+    return true;
+}
+
+bool ModuleObject::reorder(QObject *context, const QStringList &rnames)
+{
+    if (rnames.isEmpty() || size() <= 1 || rnames.size() > size()) return false;
+
+    QList<ModuleObject *> ordered_mobjs;
+    ordered_mobjs.reserve(size());
+    foreach (const QString &rname, rnames) {
+        ModuleObject *mobj = cmobj(rname);
+        if (mobj->isEmptyMobj()) return false;
+        if (ordered_mobjs.contains(mobj)) continue;
+        ordered_mobjs.append(mobj);
+    }
+    if (ordered_mobjs.size() < size()) {
+        QList<ModuleObject *> cur_mobjs = cmobjs();
+        foreach (ModuleObject *mobj, ordered_mobjs) {
+            cur_mobjs.removeOne(mobj);
+        }
+        ordered_mobjs.append(cur_mobjs);
+    }
+
+    m_mutex->lock();
+    m_first_cmobj = ordered_mobjs.first();
+    m_last_cmobj = ordered_mobjs.last();
+    for (int i = 0; i < ordered_mobjs.size(); i++) {
+        ModuleObject *mobj = ordered_mobjs.at(i);
+        mobj->setPrevBmobj(mobj == m_first_cmobj ? nullptr : ordered_mobjs.at(i - 1));
+        mobj->setNextBmobj(mobj == m_last_cmobj ? nullptr : ordered_mobjs.at(i + 1));
+    }
+    m_mutex->unlock();
+
+    //emit signal
+    if (isWatching()) activate(context, this, MOBJ_REORDER);
+
     return true;
 }
 
@@ -495,8 +536,9 @@ void ModuleObject::importFromJson(QObject *context, const QJsonValue &json_value
         }
 
         // cmobj
-        for (int i = 0; i < json_array.size(); i++) {
-            cmobj(i)->importFromJson(context, json_array.at(i), auto_insert, auto_replace, auto_remove);
+        QList<ModuleObject *> mobjs = cmobjs();
+        for (int i = 0; i < qMin(json_array.size(), mobjs.size()); i++) {
+            mobjs.at(i)->importFromJson(context, json_array.at(i), auto_insert, auto_replace, auto_remove);
         }
     } else if (json_value.isObject()) {
         QJsonObject json_obj = json_value.toObject();
@@ -517,7 +559,7 @@ void ModuleObject::importFromJson(QObject *context, const QJsonValue &json_value
 
         // cmobj
         foreach (const QString& key, json_obj.keys()) {
-            cmobj(key)->importFromJson(context, json_obj.value(key), auto_insert, auto_replace, auto_remove);
+            cmobj(key, true)->importFromJson(context, json_obj.value(key), auto_insert, auto_replace, auto_remove);
         }
     } else {
         // replace control
@@ -1009,12 +1051,12 @@ ModuleObject * ModuleManager::emptyMobj() const { return m_empty_mobj; }
 
 void ModuleManager::reserve(int max_size)
 {
-    // todo
+    m_backup_mobjs.reserve(max_size);
 }
 
 ModuleObject * ModuleManager::create(const QString &name, ModuleObject *pmobj)
 {
-     // todo
+    // todo
     return new ModuleObject(name, pmobj);
 }
 

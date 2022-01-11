@@ -54,7 +54,8 @@ public:
     enum ActivateType {
         MOBJ_CHANGE,
         MOBJ_INSERT,
-        MOBJ_REMOVE
+        MOBJ_REMOVE,
+        MOBJ_REORDER
     };
 
 public:
@@ -139,7 +140,7 @@ public:
     int size() const;
 
     QStringList cmobjNames(bool is_strict = false) const;
-    QList<ModuleObject *> cmobjs(bool is_ordered = false) const;
+    QList<ModuleObject *> cmobjs(bool is_ordered = false) const; // is_ordered is obsolete
 
     //!
     //! ---- relative module object (rmobj) ----
@@ -185,6 +186,7 @@ public:
     virtual void copyFrom(QObject *context, ModuleObject *other, bool auto_insert = true, bool auto_remove = false);
 
     bool reorder(QObject *context, int from_index, int to_index);
+    bool reorder(QObject *context, const QStringList &rnames);
 
     void clear(QObject *context, bool auto_delete = true, bool only_var = false);
 
@@ -228,7 +230,7 @@ signals:
      * @param changed_mobj is the changed mobj
      * @param changer is the context
      */
-    void activated(ModuleObject *changed_mobj, int type, QObject *changer);
+    void activated(imol::ModuleObject *changed_mobj, int type, QObject *changer);
     /**
      * @brief changed signal is emitted when value changed
      * @param var is the new value
@@ -254,14 +256,14 @@ signals:
      * @param ref is this mobj
      * @param changer is the context
      */
-    void gonnaInsert(ModuleObject *target, ModuleObject *ref, QObject *changer);
+    void gonnaInsert(imol::ModuleObject *target, imol::ModuleObject *ref, QObject *changer);
     /**
      * @brief gonnaRemove signal is emmited when this mobj will remove an exsisting child
      * @param target is the removing child
      * @param ref is this mobj
      * @param changer is the context
      */
-    void gonnaRemove(ModuleObject *target, ModuleObject *ref, QObject *changer);
+    void gonnaRemove(imol::ModuleObject *target, imol::ModuleObject *ref, QObject *changer);
 
 public slots:
     /**
