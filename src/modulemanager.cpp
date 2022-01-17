@@ -463,8 +463,7 @@ bool ModuleObject::reorder(QObject *context, const QStringList &rnames)
     ordered_mobjs.reserve(size());
     foreach (const QString &rname, rnames) {
         ModuleObject *mobj = cmobj(rname);
-        if (mobj->isEmptyMobj()) return false;
-        if (ordered_mobjs.contains(mobj)) continue;
+        if (mobj->isEmptyMobj() || ordered_mobjs.contains(mobj)) continue;
         ordered_mobjs.append(mobj);
     }
     if (ordered_mobjs.size() < size()) {
