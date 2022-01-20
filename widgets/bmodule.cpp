@@ -2,7 +2,7 @@
 
 #include "../core/common.h"
 
-IMOL_VER_REG("imol.bwaf", 8)
+IMOL_VER_REG("imol.bwaf", 9)
 
 using namespace bwaf;
 
@@ -36,7 +36,7 @@ void BModule::bindMobj(const QString &full_name)
     m_mobj = m(full_name);
 
     if (bModule(full_name)) {
-        ELOG << full_name << " already bounded";
+        ELOG << "<bwaf>" << full_name << " already bounded";
         return;
     }
 

@@ -8,3 +8,12 @@ bwaf::BFactory & bfactory()
 {
     return IMOL_CREATOR(bwaf::BModule *, (QObject *));
 }
+
+namespace imol {
+
+PluginManager & pluginManager()
+{
+    return IMOL_CREATOR(int, ());
+}
+
+}

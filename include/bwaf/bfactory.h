@@ -5,6 +5,23 @@
 
 #include "bwaf_global.h"
 
+namespace bwaf {
+class BModule;
+typedef IMOL_CREATOR_TYPE(BModule *, (QObject *)) BFactory;
+}
+
+BWAFSHARED_EXPORT bwaf::BFactory & bfactory();
+
+#define IMOL_API 11
+
+namespace imol {
+typedef IMOL_CREATOR_TYPE(int, ()) PluginManager;
+BWAFSHARED_EXPORT PluginManager & pluginManager();
+}
+
+#define IMOL_PLUGIN(KEY, CLASS_NAME) IMOL_AUTO_RUN(bfactory().regist(KEY, [] (QObject *parent) -> bwaf::BModule * {return new CLASS_NAME(parent);}); \
+    imol::pluginManager().regist(KEY, [] () -> int { return IMOL_API; }))
+
 #define BFACTORY_REGIST_MODULE(KEY, CLASS_NAME) IMOL_AUTO_RUN(bfactory().regist(KEY, [] (QObject *parent) -> bwaf::BModule * {return new CLASS_NAME(parent);}))
 
 #define BFACTORY_CREATE_SUBMODULES(PARENT, PREFIX) \
@@ -26,13 +43,5 @@
         QWidget *m_wgt; \
     }; \
     IMOL_AUTO_RUN(bfactory().regist(KEY, [] (QObject *parent) -> bwaf::BModule * {return new WIDGET_CLASS_NAME##BModule(parent);}))
-
-
-namespace bwaf {
-class BModule;
-typedef IMOL_CREATOR_TYPE(BModule *, (QObject *)) BFactory;
-}
-
-BWAFSHARED_EXPORT bwaf::BFactory & bfactory();
 
 #endif // BFACTORY_H

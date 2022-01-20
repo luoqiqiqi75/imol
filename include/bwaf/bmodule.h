@@ -61,8 +61,6 @@ signals:
     void moduleStateAboutToChange(bwaf::BModule::ModuleState module_state);
     void moduleStateChanged(bwaf::BModule::ModuleState module_state);
 
-    void loadModule(const QString &module_name, bwaf::BModule *parent_module = nullptr);
-
 public slots:
     void startSetup();
     void startInit();

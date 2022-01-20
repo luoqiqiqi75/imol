@@ -28,8 +28,8 @@ public:
     void regist(const QString &full_key, std::function<Functor> func)
     {
         if (m_funcs.contains(full_key)) return;
-        m_key_mobj->set(m_key_mobj, full_key, QVariant());
         m_funcs.insert(full_key, func);
+        m_key_mobj->set(m_key_mobj, full_key, QVariant());
     }
     void cancel(const QString &full_key)
     {
