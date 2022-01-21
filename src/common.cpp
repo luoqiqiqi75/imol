@@ -1,10 +1,11 @@
 ﻿#include "common.h"
 
-IMOL_VER_REG("imol.core", 20)
+IMOL_VER_REG("imol.core", 21)
 
 imol::VersionManager &ver()
 {
-    return IMOL_CREATOR(int, (void));
+    static imol::VersionManager mgr;
+    return mgr;
 }
 
 int sumVer(imol::ModuleObject *key_mobj)
