@@ -552,13 +552,13 @@ void ModuleObject::importFromJson(QObject *context, const QJsonValue &json_value
         // insert control
         if (auto_insert) {
             foreach (const QString& key, json_obj.keys()) {
-                if (!hasCmobj(key)) insert(context, key, auto_replace);
+                if (!hasRmobj(key)) insert(context, key, auto_replace);
             }
         }
 
-        // cmobj
+        // rmobj
         foreach (const QString& key, json_obj.keys()) {
-            cmobj(key, true)->importFromJson(context, json_obj.value(key), auto_insert, auto_replace, auto_remove);
+            rmobj(key)->importFromJson(context, json_obj.value(key), auto_insert, auto_replace, auto_remove);
         }
     } else {
         // replace control

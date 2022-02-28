@@ -1,6 +1,6 @@
 ﻿#include "common.h"
 
-IMOL_VER_REG("imol.core", 21)
+IMOL_VER_REG("imol.core", 22)
 
 imol::VersionManager &ver()
 {
