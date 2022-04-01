@@ -354,10 +354,21 @@ bool ModuleObject::insert(QObject *context, const QString &rpath, bool auto_repl
         if (tar_mobj->isEmptyMobj()) return false;
 
         if (!tar_mobj->hasCmobj(rname)) {
-            ModuleObject *mobj = m().create(isStrictName(rname) ? rname : generateId(this), tar_mobj);
-            if (!tar_mobj->insert(context, mobj, auto_replace)) {
-                delete mobj;
-                return false;
+            int index = indexOfRname(rname);
+            if (index < 0) {
+                ModuleObject *mobj = m().create(rname, tar_mobj);
+                if (!tar_mobj->insert(context, mobj, auto_replace)) {
+                    delete mobj;
+                    return false;
+                }
+            } else {
+                for (int i = tar_mobj->cmobjCount(); i <= index; i++) {
+                    ModuleObject *mobj = m().create(generateId(this), tar_mobj);
+                    if (!tar_mobj->insert(context, mobj, auto_replace)) {
+                        delete mobj;
+                        return false;
+                    }
+                }
             }
         }
 
