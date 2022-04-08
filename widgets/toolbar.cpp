@@ -1,6 +1,6 @@
 ﻿#include "toolbar.h"
 
-#include "../core/common.h"
+#include "imol/common.h"
 
 #include <QHBoxLayout>
 #include <QTabWidget>
@@ -8,6 +8,8 @@
 #define UNIT_NAME "toolbar"
 
 using namespace bwaf;
+
+IMOL_REGISTER_BUNIT(UNIT_NAME, ToolBar)
 
 ToolBar::ToolBar(QWidget *parent) : QWidget(parent), BUnit(UNIT_NAME, this),
     m_tab_wgt(new QTabWidget(this)),

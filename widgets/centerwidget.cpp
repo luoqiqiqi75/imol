@@ -1,6 +1,6 @@
 ﻿#include "centerwidget.h"
 
-#include "../core/common.h"
+#include "imol/common.h"
 
 #include <QTabWidget>
 #include <QResizeEvent>
@@ -8,6 +8,8 @@
 #define UNIT_NAME "centerwidget"
 
 using namespace bwaf;
+
+IMOL_REGISTER_BUNIT(UNIT_NAME, CenterWidget)
 
 CenterWidget::CenterWidget(QWidget *parent) : QStackedWidget(parent), BUnit(UNIT_NAME, this),
     m_tab_wgt(new QTabWidget)

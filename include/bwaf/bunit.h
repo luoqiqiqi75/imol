@@ -1,21 +1,17 @@
 ﻿#ifndef BUNIT_H
 #define BUNIT_H
 
-#include "bwaf_global.h"
+#include "imol/creatormanager.h"
 
 #include <QStringList>
 #include <QHash>
 
-#ifndef MODULE_NAME
-#define MODULE_NAME ""
-#endif
+#include "bwaf_global.h"
 
 class QWidget;
 class QObject;
 
-namespace imol {
-class ModuleObject;
-}
+namespace imol { class ModuleObject; }
 namespace bwaf {
 class BWAFSHARED_EXPORT BUnit
 {
@@ -23,7 +19,7 @@ public:
     BUnit(const QString &unit_name, QWidget *widget);
     virtual ~BUnit();
 
-    imol::ModuleObject * mobj() const {return m_mobj;}
+    imol::ModuleObject * mobj() const;
 
     static QString itemRname(const QString &item_name);
 
@@ -44,6 +40,11 @@ private:
     QObject *m_context;
     imol::ModuleObject *m_mobj;
 };
+
+typedef IMOL_CREATOR_TYPE(QWidget *, (QWidget *)) BUnitCreator;
+BWAFSHARED_EXPORT BUnitCreator & bUnitCreator();
 }
+
+#define IMOL_REGISTER_BUNIT(KEY, CLASS_NAME) IMOL_AUTO_RUN(bwaf::bUnitCreator().regist(KEY, [] (QWidget *parent) -> QWidget * { return new CLASS_NAME(parent); }))
 
 #endif // BUNIT_H

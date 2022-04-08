@@ -1,6 +1,6 @@
 ﻿#include "sidebar.h"
 
-#include "../core/common.h"
+#include "imol/common.h"
 
 #include <QVBoxLayout>
 
@@ -8,7 +8,10 @@
 
 using namespace bwaf;
 
-SideBar::SideBar(bool is_left, QWidget *parent) : QWidget(parent), BUnit(QString("%1%2").arg(is_left ? "left" : "right").arg(UNIT_NAME), this),
+IMOL_AUTO_RUN(bUnitCreator().regist("leftsidebar", [] (QWidget *parent) -> QWidget * { return new SideBar(true, parent); }));
+IMOL_AUTO_RUN(bUnitCreator().regist("rightsidebar", [] (QWidget *parent) -> QWidget * { return new SideBar(false, parent); }));
+
+SideBar::SideBar(bool is_left, QWidget *parent) : QWidget(parent), BUnit(QString("%1%2").arg(is_left ? "left" : "right", UNIT_NAME), this),
     m_is_left(is_left),
     m_top_count(0),
     m_bottom_count(0)

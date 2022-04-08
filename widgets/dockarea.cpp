@@ -1,12 +1,14 @@
 ﻿#include "dockarea.h"
 
-#include "../core/common.h"
+#include "imol/common.h"
 
 #include <QDockWidget>
 
 #define UNIT_NAME "dockarea"
 
 using namespace bwaf;
+
+IMOL_REGISTER_BUNIT(UNIT_NAME, DockArea)
 
 DockArea::DockArea(QWidget *parent) : QMainWindow(parent), BUnit(UNIT_NAME, this)
 {

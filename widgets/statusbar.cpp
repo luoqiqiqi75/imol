@@ -1,6 +1,6 @@
 ﻿#include "statusbar.h"
 
-#include "../core/common.h"
+#include "imol/common.h"
 
 #include <QHBoxLayout>
 #include <QStatusBar>
@@ -8,6 +8,8 @@
 #define UNIT_NAME "statusbar"
 
 using namespace bwaf;
+
+IMOL_REGISTER_BUNIT(UNIT_NAME, StatusBar)
 
 StatusBar::StatusBar(QWidget *parent) : QWidget(parent), BUnit(UNIT_NAME, this),
     m_statusbar(new QStatusBar(this)),

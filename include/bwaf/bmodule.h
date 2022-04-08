@@ -5,9 +5,7 @@
 
 #include <QObject>
 
-namespace imol {
-class ModuleObject;
-}
+namespace imol { class ModuleObject; }
 namespace bwaf {
 class BWAFSHARED_EXPORT BModule : public QObject
 {

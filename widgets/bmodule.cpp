@@ -1,6 +1,6 @@
 ﻿#include "bmodule.h"
 
-#include "../core/common.h"
+#include "imol/common.h"
 
 IMOL_VER_REG("imol.bwaf", 9)
 

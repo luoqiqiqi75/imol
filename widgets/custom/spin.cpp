@@ -1,4 +1,4 @@
-﻿#include "spin.h"
+﻿#include "custom/spin.h"
 
 Spin::Spin(QWidget *parent) : QSpinBox(parent)
 {

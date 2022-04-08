@@ -1,4 +1,4 @@
-﻿#include "doublespin.h"
+﻿#include "custom/doublespin.h"
 
 DoubleSpin::DoubleSpin(QWidget *parent) :
     QDoubleSpinBox(parent)

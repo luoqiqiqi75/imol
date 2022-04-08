@@ -1,11 +1,11 @@
 ﻿#include "bunit.h"
 
-#include "../core/common.h"
+#include "imol/common.h"
 
 #include <QObject>
 #include <QWidget>
 
-using namespace bwaf;
+namespace bwaf {
 
 BUnit::BUnit(const QString &unit_name, QWidget *widget):
     m_context(widget)
@@ -24,6 +24,8 @@ BUnit::~BUnit()
     m().cancel(m_context, m_mobj->fullName());
     m_mobj = m().emptyMobj();
 }
+
+imol::ModuleObject * BUnit::mobj() const { return m_mobj; }
 
 QString BUnit::itemRname(const QString &item_name)
 {
@@ -72,4 +74,12 @@ bool BUnit::removeItemObj(QObject *context, const QString &item_name, bool auto_
     if (!hasItem(item_name)) return false;
     if (auto_delete) delete getItemObj(item_name);
     return mobj()->remove(context, itemRname(item_name));
+}
+
+BUnitCreator & bUnitCreator()
+{
+    static BUnitCreator mgr;
+    return mgr;
+}
+
 }

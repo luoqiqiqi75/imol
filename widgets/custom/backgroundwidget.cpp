@@ -1,6 +1,6 @@
-﻿#include "backgroundwidget.h"
+﻿#include "custom/backgroundwidget.h"
 
-#include "../core/common.h"
+#include "imol/common.h"
 
 BackgroundWidget::BackgroundWidget(const QPixmap &pixmap, QWidget *parent) : QWidget(parent),
     m_pixmap(pixmap)

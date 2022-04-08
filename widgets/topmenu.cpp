@@ -1,6 +1,6 @@
 ﻿#include "topmenu.h"
 
-#include "../core/common.h"
+#include "imol/common.h"
 
 #include <QHBoxLayout>
 #include <QMenuBar>
@@ -13,8 +13,10 @@ IMOL_VER_REG("imol.bwaf.topmenu", 1)
 
 using namespace bwaf;
 
+IMOL_REGISTER_BUNIT(UNIT_NAME, TopMenu)
+
 TopMenu::TopMenu(QWidget *parent) : QWidget(parent), BUnit(UNIT_NAME, this),
-    m_menubar(new QMenuBar),
+    m_menubar(new QMenuBar(this)),
     m_left_count(0),
     m_right_count(0)
 {

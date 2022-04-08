@@ -1,7 +1,7 @@
 ﻿#include "navbar.h"
 #include "ui_navbar.h"
 
-#include "../core/common.h"
+#include "imol/common.h"
 
 #include <QVBoxLayout>
 #include <QTabWidget>
@@ -11,6 +11,8 @@
 #define UNIT_NAME "navbar"
 
 using namespace bwaf;
+
+IMOL_REGISTER_BUNIT(UNIT_NAME, NavBar)
 
 NavBar::NavBar(QWidget *parent) : QWidget(parent), BUnit(UNIT_NAME, this),
     ui(new Ui::NavBar),
