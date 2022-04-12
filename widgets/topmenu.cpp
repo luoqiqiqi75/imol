@@ -33,6 +33,7 @@ TopMenu::TopMenu(QWidget *parent) : QWidget(parent), BUnit(UNIT_NAME, this),
 
     m_menubar->setNativeMenuBar(false);
     m_menubar->setVisible(false);
+    m_menubar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     this->setVisible(false);
 }
 

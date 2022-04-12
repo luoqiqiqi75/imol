@@ -2,7 +2,7 @@
 
 #include "imol/common.h"
 
-IMOL_VER_REG("imol.bwaf", 9)
+IMOL_VER_REG("imol.bwaf", 10)
 
 using namespace bwaf;
 
