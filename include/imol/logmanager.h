@@ -178,7 +178,7 @@ private:
 
 //DLOG debug
 #if defined(LOG_NO_Q_DEBUG) && defined(LOG_NO_F_DEBUG)
-#define DLOG QNoDebug()
+#define DLOG if (false) QNoDebug()
 #elif defined(LOG_NO_Q_DEBUG)
 #define DLOG imol::FLog(LOG_LEVEL_STR_DEBUG, LOG_DETAILS_STR, LOG_FILE_NAME_PREFIX, LOG_FILE_NAME_SUFFIX)
 #elif defined(LOG_NO_F_DEBUG)
@@ -191,7 +191,7 @@ private:
 
 //ILOG info
 #if defined(LOG_NO_Q_INFO) && defined(LOG_NO_F_INFO)
-#define ILOG QNoDebug()
+#define ILOG if (false) QNoDebug()
 #elif defined(LOG_NO_Q_INFO)
 #define ILOG imol::FLog(LOG_LEVEL_STR_INFO, LOG_DETAILS_STR, LOG_FILE_NAME_PREFIX, LOG_FILE_NAME_SUFFIX)
 #elif defined(LOG_NO_F_INFO)
@@ -204,7 +204,7 @@ private:
 
 //WLOG warning
 #if defined(LOG_NO_Q_WARNING) && defined(LOG_NO_F_WARNING)
-#define WLOG QNoDebug()
+#define WLOG if (false) QNoDebug()
 #elif defined(LOG_NO_Q_WARNING)
 #define WLOG imol::FLog(LOG_LEVEL_STR_WARNING, LOG_DETAILS_STR, LOG_FILE_NAME_PREFIX, LOG_FILE_NAME_SUFFIX)
 #elif defined(LOG_NO_F_WARNING)
@@ -217,7 +217,7 @@ private:
 
 //ELOG error
 #if defined(LOG_NO_Q_ERROR) && defined(LOG_NO_F_ERROR)
-#define ELOG QNoDebug()
+#define ELOG if (false) QNoDebug()
 #elif defined(LOG_NO_Q_ERROR)
 #define ELOG imol::FLog(LOG_LEVEL_STR_ERROR, LOG_DETAILS_STR, LOG_FILE_NAME_PREFIX, LOG_FILE_NAME_SUFFIX)
 #elif defined(LOG_NO_F_ERROR)
