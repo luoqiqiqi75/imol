@@ -1,5 +1,5 @@
-﻿#ifndef CREATORMANAGER_H
-#define CREATORMANAGER_H
+﻿#ifndef IMOL_CREATORMANAGER_H
+#define IMOL_CREATORMANAGER_H
 
 #include <functional>
 
@@ -58,4 +58,4 @@ private:
 #define IMOL_AUTO_RUN_VAR IMOL_AUTO_RUN_NAME(_imol_auto_run_var_, __LINE__)
 #define IMOL_AUTO_RUN(_CONTENT) namespace {int IMOL_AUTO_RUN_FUNC() {_CONTENT; return 0;} int IMOL_AUTO_RUN_VAR = IMOL_AUTO_RUN_FUNC();}
 
-#endif // CREATORMANAGER_H
+#endif // IMOL_CREATORMANAGER_H

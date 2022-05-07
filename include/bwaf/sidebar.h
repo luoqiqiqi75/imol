@@ -1,5 +1,5 @@
-﻿#ifndef SIDEBAR_H
-#define SIDEBAR_H
+﻿#ifndef IMOL_SIDEBAR_H
+#define IMOL_SIDEBAR_H
 
 #include "bwaf_global.h"
 
@@ -28,4 +28,4 @@ private:
 BWAFSHARED_EXPORT bwaf::SideBar * instantiatedSideBar(QObject *, bool is_left);
 BWAFSHARED_EXPORT bwaf::SideBar * instantiatedSideBar(bool is_left);
 
-#endif // SIDEBAR_H
+#endif // IMOL_SIDEBAR_H

@@ -1,5 +1,5 @@
-﻿#ifndef NETWORKMANAGER_H
-#define NETWORKMANAGER_H
+﻿#ifndef IMOL_NETWORKMANAGER_H
+#define IMOL_NETWORKMANAGER_H
 
 #include "core_global.h"
 
@@ -379,4 +379,4 @@ private:
 CORESHARED_EXPORT imol::NetworkManager & net();
 CORESHARED_EXPORT imol::NetworkObject * net(const QString &name);
 
-#endif // NETWORKMANAGER_H
+#endif // IMOL_NETWORKMANAGER_H

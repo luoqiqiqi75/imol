@@ -1,5 +1,5 @@
-﻿#ifndef BFACTORY_H
-#define BFACTORY_H
+﻿#ifndef IMOL_BFACTORY_H
+#define IMOL_BFACTORY_H
 
 #include "imol/creatormanager.h"
 
@@ -44,4 +44,4 @@ BWAFSHARED_EXPORT PluginManager & pluginManager();
     }; \
     IMOL_AUTO_RUN(bfactory().regist(KEY, [] (QObject *parent) -> bwaf::BModule * {return new WIDGET_CLASS_NAME##BModule(parent);}))
 
-#endif // BFACTORY_H
+#endif // IMOL_BFACTORY_H

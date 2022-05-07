@@ -1,5 +1,5 @@
-﻿#ifndef TOOLBAR_H
-#define TOOLBAR_H
+﻿#ifndef IMOL_TOOLBAR_H
+#define IMOL_TOOLBAR_H
 
 #include "bwaf_global.h"
 
@@ -32,4 +32,4 @@ private:
 BWAFSHARED_EXPORT bwaf::ToolBar * instantiatedToolBar(QObject *);
 BWAFSHARED_EXPORT bwaf::ToolBar * instantiatedToolBar();
 
-#endif // TOOLBAR_H
+#endif // IMOL_TOOLBAR_H

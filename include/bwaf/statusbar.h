@@ -1,5 +1,5 @@
-﻿#ifndef STATUSBAR_H
-#define STATUSBAR_H
+﻿#ifndef IMOL_STATUSBAR_H
+#define IMOL_STATUSBAR_H
 
 #include "bwaf_global.h"
 
@@ -32,4 +32,4 @@ private:
 BWAFSHARED_EXPORT bwaf::StatusBar * instantiatedStatusBar(QObject *);
 BWAFSHARED_EXPORT bwaf::StatusBar * instantiatedStatusBar();
 
-#endif // STATUSBAR_H
+#endif // IMOL_STATUSBAR_H

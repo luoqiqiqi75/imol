@@ -1,5 +1,5 @@
-﻿#ifndef BUNIT_H
-#define BUNIT_H
+﻿#ifndef IMOL_BUNIT_H
+#define IMOL_BUNIT_H
 
 #include "imol/creatormanager.h"
 
@@ -47,4 +47,4 @@ BWAFSHARED_EXPORT BUnitCreator & bUnitCreator();
 
 #define IMOL_REGISTER_BUNIT(KEY, CLASS_NAME) IMOL_AUTO_RUN(bwaf::bUnitCreator().regist(KEY, [] (QWidget *parent) -> QWidget * { return new CLASS_NAME(parent); }))
 
-#endif // BUNIT_H
+#endif // IMOL_BUNIT_H

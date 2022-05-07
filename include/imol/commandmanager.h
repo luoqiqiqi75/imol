@@ -1,5 +1,5 @@
-﻿#ifndef COMMANDMANAGER_H
-#define COMMANDMANAGER_H
+﻿#ifndef IMOL_COMMANDMANAGER_H
+#define IMOL_COMMANDMANAGER_H
 
 #include "core_global.h"
 
@@ -72,4 +72,4 @@ private:
 //output function
 CORESHARED_EXPORT imol::CommandManager & command();
 
-#endif // COMMANDMANAGER_H
+#endif // IMOL_COMMANDMANAGER_H

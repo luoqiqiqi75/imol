@@ -1,5 +1,5 @@
-﻿#ifndef COMMON_H
-#define COMMON_H
+﻿#ifndef IMOL_COMMON_H
+#define IMOL_COMMON_H
 
 #include "core_global.h"
 
@@ -26,4 +26,4 @@ CORESHARED_EXPORT int ver(const QString &key, bool sum = false);
 
 #define IMOL_VER_REG(KEY, VER) IMOL_AUTO_RUN(ver().regist(KEY, [] (void) -> int {return VER;}))
 
-#endif // COMMON_H
+#endif // IMOL_COMMON_H

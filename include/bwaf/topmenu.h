@@ -1,5 +1,5 @@
-﻿#ifndef TOPMENU_H
-#define TOPMENU_H
+﻿#ifndef IMOL_TOPMENU_H
+#define IMOL_TOPMENU_H
 
 #include "bwaf_global.h"
 
@@ -40,4 +40,4 @@ private:
 BWAFSHARED_EXPORT bwaf::TopMenu * instantiatedTopMenu(QObject *);
 BWAFSHARED_EXPORT bwaf::TopMenu * instantiatedTopMenu();
 
-#endif // TOPMENU_H
+#endif // IMOL_TOPMENU_H

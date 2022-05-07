@@ -1,5 +1,5 @@
-﻿#ifndef LOGMANAGER_H
-#define LOGMANAGER_H
+﻿#ifndef IMOL_LOGMANAGER_H
+#define IMOL_LOGMANAGER_H
 
 #include "core_global.h"
 
@@ -232,4 +232,4 @@ private:
 #define SLOG imol::QFLog(LOG_COLOR_STR_SUDO, LOG_LEVEL_STR_SUDO, LOG_DETAILS_STR, LOG_FILE_NAME_PREFIX, LOG_FILE_NAME_SUFFIX)
 #define SSLOG (SLOG).space()
 
-#endif // LOGMANAGER_H
+#endif // IMOL_LOGMANAGER_H

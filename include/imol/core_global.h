@@ -1,5 +1,5 @@
-#ifndef CORE_GLOBAL_H
-#define CORE_GLOBAL_H
+﻿#ifndef IMOL_CORE_GLOBAL_H
+#define IMOL_CORE_GLOBAL_H
 
 #include <QtCore/qglobal.h>
 
@@ -9,4 +9,4 @@
 #  define CORESHARED_EXPORT Q_DECL_IMPORT
 #endif
 
-#endif // CORE_GLOBAL_H
+#endif // IMOL_CORE_GLOBAL_H

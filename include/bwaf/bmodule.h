@@ -1,5 +1,5 @@
-﻿#ifndef BMODULE_H
-#define BMODULE_H
+﻿#ifndef IMOL_BMODULE_H
+#define IMOL_BMODULE_H
 
 #include "bwaf_global.h"
 
@@ -118,4 +118,4 @@ private:
 
 BWAFSHARED_EXPORT bwaf::BModule * bModule(const QString &full_name);
 
-#endif // BMODULE_H
+#endif // IMOL_BMODULE_H

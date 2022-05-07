@@ -1,5 +1,5 @@
-﻿#ifndef DOCKAREA_H
-#define DOCKAREA_H
+﻿#ifndef IMOL_DOCKAREA_H
+#define IMOL_DOCKAREA_H
 
 #include "bwaf_global.h"
 
@@ -31,4 +31,4 @@ public:
 
 BWAFSHARED_EXPORT bwaf::DockArea * instantiatedDockArea();
 
-#endif // DOCKAREA_H
+#endif // IMOL_DOCKAREA_H

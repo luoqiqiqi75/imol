@@ -1,5 +1,5 @@
-﻿#ifndef TRANSLATIONMANAGER_H
-#define TRANSLATIONMANAGER_H
+﻿#ifndef IMOL_TRANSLATIONMANAGER_H
+#define IMOL_TRANSLATIONMANAGER_H
 
 #include "core_global.h"
 
@@ -48,4 +48,4 @@ private:
 //output methods
 CORESHARED_EXPORT imol::TranslationManager & translator();
 
-#endif // TRANSLATIONMANAGER_H
+#endif // IMOL_TRANSLATIONMANAGER_H

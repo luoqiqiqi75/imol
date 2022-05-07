@@ -1,5 +1,5 @@
-﻿#ifndef MODULEMANAGER_H
-#define MODULEMANAGER_H
+﻿#ifndef IMOL_MODULEMANAGER_H
+#define IMOL_MODULEMANAGER_H
 
 #include "core_global.h"
 
@@ -392,4 +392,4 @@ CORESHARED_EXPORT QString mName(const QString &n0, const QString &n1, const QStr
 CORESHARED_EXPORT QString mName(const QString &n0, const QString &n1, const QString &n2, const QString &n3, const QString &n4, const QString &n5);
 CORESHARED_EXPORT QString mName(const QString &n0, const QString &n1, const QString &n2, const QString &n3, const QString &n4, const QString &n5, const QString &n6);
 
-#endif // MODULEMANAGER_H
+#endif // IMOL_MODULEMANAGER_H

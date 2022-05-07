@@ -1,5 +1,5 @@
-﻿#ifndef STATEMANAGER_H
-#define STATEMANAGER_H
+﻿#ifndef IMOL_STATEMANAGER_H
+#define IMOL_STATEMANAGER_H
 
 #include "core_global.h"
 
@@ -125,4 +125,4 @@ private:
 //output methods
 CORESHARED_EXPORT imol::StateManager & state();
 
-#endif // STATEMANAGER_H
+#endif // IMOL_STATEMANAGER_H

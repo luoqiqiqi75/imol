@@ -1,5 +1,5 @@
-#ifndef BWAF_GLOBAL_H
-#define BWAF_GLOBAL_H
+﻿#ifndef IMOL_BWAF_GLOBAL_H
+#define IMOL_BWAF_GLOBAL_H
 
 #include <QtCore/qglobal.h>
 
@@ -9,4 +9,4 @@
 #  define BWAFSHARED_EXPORT Q_DECL_IMPORT
 #endif
 
-#endif // BWAF_GLOBAL_H
+#endif // IMOL_BWAF_GLOBAL_H

@@ -1,5 +1,5 @@
-﻿#ifndef NAVBAR_H
-#define NAVBAR_H
+﻿#ifndef IMOL_NAVBAR_H
+#define IMOL_NAVBAR_H
 
 #include "bwaf_global.h"
 
@@ -35,4 +35,4 @@ private:
 BWAFSHARED_EXPORT bwaf::NavBar * instantiatedNavBar(QObject *);
 BWAFSHARED_EXPORT bwaf::NavBar * instantiatedNavBar();
 
-#endif // NAVBAR_H
+#endif // IMOL_NAVBAR_H

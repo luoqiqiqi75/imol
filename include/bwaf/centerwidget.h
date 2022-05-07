@@ -1,5 +1,5 @@
-﻿#ifndef CENTERWIDGET_H
-#define CENTERWIDGET_H
+﻿#ifndef IMOL_CENTERWIDGET_H
+#define IMOL_CENTERWIDGET_H
 
 #include "bwaf_global.h"
 
@@ -38,4 +38,4 @@ private:
 BWAFSHARED_EXPORT bwaf::CenterWidget * instantiatedCenterWidget(QObject *);
 BWAFSHARED_EXPORT bwaf::CenterWidget * instantiatedCenterWidget();
 
-#endif // CENTERWIDGET_H
+#endif // IMOL_CENTERWIDGET_H
