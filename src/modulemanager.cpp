@@ -526,50 +526,160 @@ void ModuleObject::dump(ModuleObject *rmobj) const
     }
 }
 
-void ModuleObject::importFromJson(QObject *context, const QJsonValue &json_value, bool auto_insert, bool auto_replace, bool auto_remove)
+void ModuleObject::importFromVariant(QObject *context, const QVariant &var, bool auto_insert, bool auto_replace, bool auto_remove)
 {
-    if (json_value.isArray()) {
-        QJsonArray json_array = json_value.toArray();
+    if (var.type() == QVariant::List) {
+        QVariantList list = var.toList();
 
         // remove control
         if (auto_remove) {
-            while (cmobjCount() > json_array.size()) {
+            while (cmobjCount() > list.size()) {
                 remove(context, last());
             }
         }
 
         // insert control
         if (auto_insert) {
-            while (cmobjCount() < json_array.size()) {
+            while (cmobjCount() < list.size()) {
                 append(context);
             }
         }
 
         // cmobj
         QList<ModuleObject *> mobjs = cmobjs();
-        for (int i = 0; i < qMin(json_array.size(), mobjs.size()); i++) {
-            mobjs.at(i)->importFromJson(context, json_array.at(i), auto_insert, auto_replace, auto_remove);
+        for (int i = 0; i < qMin(list.size(), mobjs.size()); i++) {
+            mobjs.at(i)->importFromVariant(context, list.at(i), auto_insert, auto_replace, auto_remove);
         }
-    } else if (json_value.isObject()) {
-        QJsonObject json_obj = json_value.toObject();
+    } else if (var.type() == QVariant::Map) {
+        QVariantMap dict = var.toMap();
 
         // remove control
         if (auto_remove) {
             foreach (const QString& key, cmobjNames(true)) {
-                if (!json_obj.contains(key)) remove(context, key);
+                if (!dict.contains(key)) remove(context, key);
             }
         }
 
         // insert control
         if (auto_insert) {
-            foreach (const QString& key, json_obj.keys()) {
+            foreach (const QString& key, dict.keys()) {
                 if (!hasRmobj(key)) insert(context, key, auto_replace);
             }
         }
 
         // rmobj
-        foreach (const QString& key, json_obj.keys()) {
-            rmobj(key)->importFromJson(context, json_obj.value(key), auto_insert, auto_replace, auto_remove);
+        foreach (const QString& key, dict.keys()) {
+            rmobj(key)->importFromVariant(context, dict.value(key), auto_insert, auto_replace, auto_remove);
+        }
+    } else if (var.type() == QVariant::Hash) {
+        QVariantHash dict = var.toHash();
+
+        // remove control
+        if (auto_remove) {
+            foreach (const QString& key, cmobjNames(true)) {
+                if (!dict.contains(key)) remove(context, key);
+            }
+        }
+
+        // insert control
+        if (auto_insert) {
+            foreach (const QString& key, dict.keys()) {
+                if (!hasRmobj(key)) insert(context, key, auto_replace);
+            }
+        }
+
+        // rmobj
+        foreach (const QString& key, dict.keys()) {
+            rmobj(key)->importFromVariant(context, dict.value(key), auto_insert, auto_replace, auto_remove);
+        }
+    } else {
+        // replace control
+        if (!auto_replace) return;
+
+        // remove control
+        if (auto_remove) {
+            foreach (ModuleObject *mobj, cmobjs()) {
+                remove(context, mobj);
+            }
+        }
+
+        // data
+        set(context, var);
+        return;
+    }
+
+    //emit signal
+    if (!isQuiet()) emit changed(m_var, m_var, context);
+    if (isWatching()) activate(context, this, MOBJ_CHANGE);
+}
+
+QVariant ModuleObject::exportToVariant(bool auto_ignore) const
+{
+    // set var
+    if (!hasCmobj()) return get();
+
+    if (first()->isRelative()) {
+        // build as list
+        QVariantList list;
+        foreach (ModuleObject *mobj, cmobjs(true)) {
+            list.append(mobj->exportToVariant(auto_ignore));
+        }
+        return list;
+    } else {
+        // build as dict
+        QVariantMap dict;
+        foreach (const QString &name, cmobjNames(true)) {
+            if (auto_ignore && name.startsWith(IMOL_MODULE_SPECIAL_START)) continue;
+            dict.insert(name, cmobj(name, true)->exportToVariant(auto_ignore));
+        }
+        return dict;
+    }
+}
+
+void ModuleObject::importFromJson(QObject *context, const QJsonValue &json_value, bool auto_insert, bool auto_replace, bool auto_remove)
+{
+    if (json_value.isArray()) {
+        QJsonArray list = json_value.toArray();
+
+        // remove control
+        if (auto_remove) {
+            while (cmobjCount() > list.size()) {
+                remove(context, last());
+            }
+        }
+
+        // insert control
+        if (auto_insert) {
+            while (cmobjCount() < list.size()) {
+                append(context);
+            }
+        }
+
+        // cmobj
+        QList<ModuleObject *> mobjs = cmobjs();
+        for (int i = 0; i < qMin(list.size(), mobjs.size()); i++) {
+            mobjs.at(i)->importFromJson(context, list.at(i), auto_insert, auto_replace, auto_remove);
+        }
+    } else if (json_value.isObject()) {
+        QJsonObject dict = json_value.toObject();
+
+        // remove control
+        if (auto_remove) {
+            foreach (const QString& key, cmobjNames(true)) {
+                if (!dict.contains(key)) remove(context, key);
+            }
+        }
+
+        // insert control
+        if (auto_insert) {
+            foreach (const QString& key, dict.keys()) {
+                if (!hasRmobj(key)) insert(context, key, auto_replace);
+            }
+        }
+
+        // rmobj
+        foreach (const QString& key, dict.keys()) {
+            rmobj(key)->importFromJson(context, dict.value(key), auto_insert, auto_replace, auto_remove);
         }
     } else {
         // replace control
@@ -599,19 +709,19 @@ QJsonValue ModuleObject::exportToJson(bool auto_ignore) const
 
     if (first()->isRelative()) {
         //build json array
-        QJsonArray json_array;
+        QJsonArray list;
         foreach (ModuleObject *mobj, cmobjs(true)) {
-            json_array.append(mobj->exportToJson());
+            list.append(mobj->exportToJson(auto_ignore));
         }
-        return json_array;
+        return list;
     } else {
         //build json object
-        QJsonObject json_obj;
+        QJsonObject dict;
         foreach (const QString &name, cmobjNames(true)) {
             if (auto_ignore && name.startsWith(IMOL_MODULE_SPECIAL_START)) continue;
-            json_obj.insert(name, cmobj(name, true)->exportToJson());
+            dict.insert(name, cmobj(name, true)->exportToJson(auto_ignore));
         }
-        return json_obj;
+        return dict;
     }
 }
 
@@ -1110,6 +1220,28 @@ QString ModuleManager::convertToUtf8(const QByteArray &content)
     }
 
     return text;
+}
+
+QVariant ModuleManager::readFromJsonAsVariant(const QString &json_path)
+{
+    QFile json_file(json_path);
+    if (!json_file.open(QIODevice::ReadOnly)) {
+        ELOG << "<m><static> cannot read json file: \"" << json_path << "\"";
+        return QJsonValue();
+    }
+    QByteArray json_raw = json_file.readAll();
+    json_file.close();
+
+    QJsonParseError json_err;
+    QJsonDocument json_doc = QJsonDocument::fromJson(json_raw, &json_err);
+    //try to fix codec problem
+    if (json_err.error == QJsonParseError::IllegalUTF8String) {
+        json_doc = QJsonDocument::fromJson(convertToUtf8(json_raw).toUtf8(), &json_err);
+    }
+    if (json_err.error != QJsonParseError::NoError) {
+        ELOG << "<m><static> read invalid json from: \"" << json_path << "\", parse error: \"" << json_err.errorString() << "\"";
+    }
+    return json_doc.toVariant();
 }
 
 QJsonValue ModuleManager::readFromJson(const QString &json_path)

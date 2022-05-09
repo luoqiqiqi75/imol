@@ -193,6 +193,9 @@ public:
     //! output all info into log
     void dump(ModuleObject *rmobj = nullptr) const;
 
+    void importFromVariant(QObject *context, const QVariant &var, bool auto_insert = true, bool auto_replace = true, bool auto_remove = false);
+    QVariant exportToVariant(bool auto_ignore = true) const;
+
     //!
     //! \brief use json struction to construct children nodes
     //!
@@ -363,6 +366,8 @@ public:
     bool exportToJson(QObject *context, const QString &full_name, const QString &json_path); //obsolete
 
     static QString convertToUtf8(const QByteArray &content);
+
+    static QVariant readFromJsonAsVariant(const QString &json_path);
 
     static QJsonValue readFromJson(const QString &json_path);
     static bool writeToJson(const QString &json_path, const QJsonValue &json_value, bool auto_create_path = true);
