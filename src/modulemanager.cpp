@@ -1227,7 +1227,7 @@ QVariant ModuleManager::readFromJsonAsVariant(const QString &json_path)
     QFile json_file(json_path);
     if (!json_file.open(QIODevice::ReadOnly)) {
         ELOG << "<m><static> cannot read json file: \"" << json_path << "\"";
-        return QJsonValue();
+        return QVariant();
     }
     QByteArray json_raw = json_file.readAll();
     json_file.close();
