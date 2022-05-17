@@ -633,7 +633,7 @@ NetworkManager::~NetworkManager()
     qDeleteAll(m_objects);
     //stop all threads
     foreach (QThread *handler_thread, m_thread_load_hash.keys()) {
-//        handler_thread->exit();
+        handler_thread->exit();
         handler_thread->wait();
 //        delete handler_thread;
         handler_thread->deleteLater();
