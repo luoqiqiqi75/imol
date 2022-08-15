@@ -7,6 +7,7 @@
 #include <QTcpSocket>
 #include <QSslSocket>
 #include <QTcpServer>
+#include <QNetworkProxy>
 #include <QFileInfo>
 #include <QDir>
 #include <QJsonDocument>
@@ -321,6 +322,7 @@ NetworkHandle::NetworkHandle(NetworkType net_type, QAbstractSocket *socket, cons
         switch (net_type) {
         case NETWORK_UDP: {
             QUdpSocket *udp_socket = new QUdpSocket(this);
+            udp_socket->setProxy(QNetworkProxy::NoProxy);
             if (channel.localPort > 0) {
                 if (!channel.localIP.isBroadcast()) {
                     udp_socket->bind(channel.localIP, channel.localPort, QUdpSocket::ShareAddress);
@@ -334,6 +336,7 @@ NetworkHandle::NetworkHandle(NetworkType net_type, QAbstractSocket *socket, cons
             break;
         case NETWORK_TCP: {
             QTcpSocket *tcp_socket = new QTcpSocket(this);
+            tcp_socket->setProxy(QNetworkProxy::NoProxy);
             if (channel.localPort > 0) tcp_socket->bind(channel.localIP, channel.localPort, QTcpSocket::ShareAddress);
             m_socket = tcp_socket;
         }
