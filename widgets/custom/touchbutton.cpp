@@ -19,7 +19,8 @@ bool TouchButton::eventFilter(QObject *obj, QEvent *e)
         if (!isEnabled()) break;
         emit touchBegun();
         break;
-    case QEvent::TouchEnd: case QEvent::TouchCancel: case QEvent::MouseButtonRelease: case QEvent::Leave:
+    case QEvent::TouchEnd: case QEvent::TouchCancel: case QEvent::MouseButtonRelease:
+    case QEvent::Leave: case QEvent::FocusOut:
         if (!m_is_triggered) break;
         m_is_triggered = false;
         if (!isEnabled()) break;
