@@ -1,9 +1,13 @@
 ﻿#include "custom/graphicsview.h"
 
+#include "imol/common.h"
+
 #include <QGraphicsItem>
 #include <QKeyEvent>
 #include <QScrollBar>
 #include <QDebug>
+
+IMOL_VER_REG("bwaf.custom.graphicsview", 2)
 
 #define TRANSLATE_STEP 2
 
@@ -111,7 +115,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
     QGraphicsView::mouseMoveEvent(event);
 
-    if (scene()->mouseGrabberItem() || event->buttons() != Qt::LeftButton) return;
+    if (scene()->mouseGrabberItem() || event->buttons() != Qt::LeftButton || !property("dragable").toBool()) return;
 
     // Make sure shift is not being pressed
     if ((event->modifiers() & Qt::ShiftModifier) != 0) return;
