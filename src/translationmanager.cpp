@@ -3,9 +3,12 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QFile>
+#include <QDir>
+#include <QFileInfo>
 #include <QTranslator>
 #include <QCoreApplication>
 
+#include "modulemanager.h"
 #include "logmanager.h"
 
 using namespace imol;
@@ -16,6 +19,11 @@ TranslationManager::TranslationManager(QObject *parent) : QObject(parent),
     //local language
     m_qt_translator->load(QLocale(), "qt", "_", ":/imol/language");
     qApp->installTranslator(m_qt_translator);
+    QString cfg_language = m("imol.cfg.common.language")->getString("en");
+    foreach (auto fi, QDir("./i18n").entryInfoList(QStringList() << QString("*_%1.qm").arg(cfg_language), QDir::Files | QDir::NoDotAndDotDot)) {
+        bool success = installQMTranslator(fi.absoluteFilePath());
+        ILOG << "<translator> install " << cfg_language << " language qm " << fi.baseName() << (success ? " succeed" : " failed");
+    }
 }
 
 TranslationManager::~TranslationManager()
