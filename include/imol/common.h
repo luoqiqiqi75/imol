@@ -14,16 +14,18 @@
 namespace imol {
 //version control
 typedef CreatorManager<int, int(void)> VersionManager;
+CORESHARED_EXPORT imol::VersionManager & versionManager();
+CORESHARED_EXPORT QString releaseVersionString(const QString &key);
 }
 
-/**
- * @brief VersionManager is extremly useful for finer defined versions, the version saved in
- * a CreatorManager instance, and can be obtained by means of CreatorManager methods
- * @return global version manager
- */
-CORESHARED_EXPORT imol::VersionManager & ver();
+CORESHARED_EXPORT imol::VersionManager & ver(); // obosolette
 CORESHARED_EXPORT int ver(const QString &key, bool sum = false);
 
-#define IMOL_VER_REG(KEY, VER) IMOL_AUTO_RUN(ver().regist(KEY, [] (void) -> int {return VER;}))
+#define IMOL_VER_REG(KEY, VER) IMOL_AUTO_RUN(imol::versionManager().regist(KEY, [] (void) -> int { return VER; }))
+
+#define IMOL_RELEASE_VER_REG(KEY, MAJOR, MINOR, BASELINE) IMOL_AUTO_RUN( \
+imol::versionManager().regist(QString("@0_%1").arg(KEY), [] (void) -> int { return BASELINE; }); \
+imol::versionManager().regist(QString("@1_%1").arg(KEY), [] (void) -> int { return MAJOR; }); \
+imol::versionManager().regist(QString("@2_%1").arg(KEY), [] (void) -> int { return MINOR; }))
 
 #endif // IMOL_COMMON_H
