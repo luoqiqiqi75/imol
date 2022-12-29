@@ -31,8 +31,15 @@ QString releaseVersionString(const QString &key)
     int baseline = versionManager().create(QString("@0_%1").arg(key));
     int major = versionManager().create(QString("@1_%1").arg(key));
     int minor = versionManager().create(QString("@2_%1").arg(key));
+    QStringList ver_str_list;
+    for (int i = 3; i < 10; i++) {
+        QString sub_ver_key = QString("@%1_%2").arg(i).arg(key);
+        if (!versionManager().keyMobj(sub_ver_key)->isEmptyMobj()) ver_str_list.append(QString::number(versionManager().create(sub_ver_key)));
+    }
 
-    return QString("v%1.%2.%3").arg(major).arg(minor).arg(ver(key, true) - baseline);
+    QString ver_str = QString("v%1.%2.%3").arg(major).arg(minor).arg(ver(key, true) - baseline);
+    if (ver_str_list.size() > 0) ver_str.append(".").append(ver_str_list.join("."));
+    return ver_str;
 }
 
 }
