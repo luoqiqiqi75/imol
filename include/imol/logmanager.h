@@ -9,8 +9,8 @@
 #include <QDebug>
 
 #ifndef LOG_FILE_NAME_PREFIX
-#ifdef MODULE_NAME
-#define LOG_FILE_NAME_PREFIX QString("./log/%1").arg(MODULE_NAME)
+#ifdef IMOL_LOG_PREFIX
+#define LOG_FILE_NAME_PREFIX QString("./log/%1").arg(IMOL_LOG_PREFIX)
 #else
 #define LOG_FILE_NAME_PREFIX QString("./log/global")
 #endif
