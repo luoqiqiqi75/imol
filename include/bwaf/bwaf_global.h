@@ -3,7 +3,9 @@
 
 #include <QtCore/qglobal.h>
 
-#if defined(BWAF_LIBRARY)
+#if defined(IMOL_STATIC_LIBRARY)
+#  define BWAFSHARED_EXPORT
+#elif defined(BWAF_LIBRARY)
 #  define BWAFSHARED_EXPORT Q_DECL_EXPORT
 #else
 #  define BWAFSHARED_EXPORT Q_DECL_IMPORT

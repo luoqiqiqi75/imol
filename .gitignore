@@ -1,0 +1,9 @@
+/build*/
+/out/
+/.idea/
+/.vs/
+/.vscode/
+*.user
+*.autosave
+*.log
+/log/
