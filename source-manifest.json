@@ -1,0 +1,102 @@
+﻿[
+    {
+        "path":  "imol/base.h",
+        "sha256":  "f6acd03093cf00239dd51c2ed29fbb16e51ca6197781c29e3e288a7e881f3756"
+    },
+    {
+        "path":  "imol/commandmanager.h",
+        "sha256":  "f758d2e8b4732be2e7ebcb873992710e2816301ed73e93c7764ff28b34fcf74f"
+    },
+    {
+        "path":  "imol/common.h",
+        "sha256":  "b15177dbadfe84144fed80dbe6caee071977908251a1b39398b41a159d3c9439"
+    },
+    {
+        "path":  "imol/datamanager.h",
+        "sha256":  "38680512e075e65b5975d5d1e1dda30fe3887ea78880204da0a5002549c160b8"
+    },
+    {
+        "path":  "imol/loopmanager.h",
+        "sha256":  "922b6e446dff8776ee247a7adaad7825a09816fe24be023742c4956edfa405ec"
+    },
+    {
+        "path":  "imol/module.h",
+        "sha256":  "3eb4e282795b1a01190edaecfd3c6d2a30903214b49ed61e9b1fe810102f15ae"
+    },
+    {
+        "path":  "imol/netmanager.h",
+        "sha256":  "15d289ff1a03ca3eb1b70b87775b00e81630457c7f5f03e85d46d21f2d12cb78"
+    },
+    {
+        "path":  "imol/src/base.cpp",
+        "sha256":  "9e7b1d5a752498632887b2c13e45c80d97796ecaa7414ab315063eca96bf9d83"
+    },
+    {
+        "path":  "imol/src/commandmanager.cpp",
+        "sha256":  "f7a3b4d28e7a3bdb8b2ada08e30f80bb2947b80e86e64b4d55d14d63bd74615d"
+    },
+    {
+        "path":  "imol/src/common.cpp",
+        "sha256":  "df9bb738ba8bd06790b24610471337e2eefaef3973141f7af7eace281b4916b7"
+    },
+    {
+        "path":  "imol/src/datamanager.cpp",
+        "sha256":  "bbbc5fad5fee779e4fe9f752e880924b8f71c8567b149bd82dd2646cb00f870e"
+    },
+    {
+        "path":  "imol/src/loopmanager.cpp",
+        "sha256":  "f441c9427ca59239d4e628cc20e59c7508a76eb69fe88307c9d940e57a4f0ee7"
+    },
+    {
+        "path":  "imol/src/module.cpp",
+        "sha256":  "71184729d7c09a63c09314ec1c6afd65379da513167287f875a353b4819cc6cd"
+    },
+    {
+        "path":  "imol/src/netmanager.cpp",
+        "sha256":  "6a55af5f7857a89848a4bbe51557d41da48af69fa07d422397d12194a0bb8720"
+    },
+    {
+        "path":  "imol/src/loop/evpploopobject.cpp",
+        "sha256":  "43e62809098246ad3f3a1dd8ef2c27ff4c194020944495818fd0b9fe0c8eda6a"
+    },
+    {
+        "path":  "imol/src/loop/evpploopobject.h",
+        "sha256":  "6ea292bb01fbb5e249e0b218f0bd3515da55711466d53f805e14a53298d18ae3"
+    },
+    {
+        "path":  "imol/src/loop/poolloopobject.cpp",
+        "sha256":  "23e781c3551e7a184b89a6f90418ac53082a4d6ca7ab7df6eaa16428ae47e1ed"
+    },
+    {
+        "path":  "imol/src/loop/poolloopobject.h",
+        "sha256":  "1dd3b6bf236ea42c89601a888e97e301bae9f228122a96a4f773d9a9982e2a2a"
+    },
+    {
+        "path":  "imol/src/loop/rtloopobject.cpp",
+        "sha256":  "b233c8d779e70d6867bd845aee07bf8a37264a5477c8ed7949b55ae87ad80bea"
+    },
+    {
+        "path":  "imol/src/loop/rtloopobject.h",
+        "sha256":  "3b12e5d5f637b9b9febbc71a3fe7a60e87829d41c928e0c22dfc0499e69903af"
+    },
+    {
+        "path":  "imol/src/net/evppclientnetobject.cpp",
+        "sha256":  "cb97349a2739264f4e3870b3274c3205c8bc5c7b74d44eb5395006ad41ba1e26"
+    },
+    {
+        "path":  "imol/src/net/evppclientnetobject.h",
+        "sha256":  "85d662f2ec3ac4388718cc60429430e526138cba702137d6fdd09e50af9cf2dd"
+    },
+    {
+        "path":  "imol/src/net/evppmsghandler.h",
+        "sha256":  "be4ae6682495b331c932c6dd7240d6fb5bce8f56f220ddaf3e7777b805a7baa7"
+    },
+    {
+        "path":  "imol/src/net/evppservernetobject.cpp",
+        "sha256":  "69209c94b33d75d7966b9940549e544ffa6ca358a6044ffced3eae3477a59c55"
+    },
+    {
+        "path":  "imol/src/net/evppservernetobject.h",
+        "sha256":  "7b4d8326e0733f38da7a7d12667eec73f60789f72b2b90bb739309afbc11f860"
+    }
+]
