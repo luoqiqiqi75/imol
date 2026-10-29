@@ -44,18 +44,6 @@
         "sha256":  "bbbc5fad5fee779e4fe9f752e880924b8f71c8567b149bd82dd2646cb00f870e"
     },
     {
-        "path":  "imol/src/loopmanager.cpp",
-        "sha256":  "f441c9427ca59239d4e628cc20e59c7508a76eb69fe88307c9d940e57a4f0ee7"
-    },
-    {
-        "path":  "imol/src/module.cpp",
-        "sha256":  "71184729d7c09a63c09314ec1c6afd65379da513167287f875a353b4819cc6cd"
-    },
-    {
-        "path":  "imol/src/netmanager.cpp",
-        "sha256":  "6a55af5f7857a89848a4bbe51557d41da48af69fa07d422397d12194a0bb8720"
-    },
-    {
         "path":  "imol/src/loop/evpploopobject.cpp",
         "sha256":  "43e62809098246ad3f3a1dd8ef2c27ff4c194020944495818fd0b9fe0c8eda6a"
     },
@@ -80,6 +68,14 @@
         "sha256":  "3b12e5d5f637b9b9febbc71a3fe7a60e87829d41c928e0c22dfc0499e69903af"
     },
     {
+        "path":  "imol/src/loopmanager.cpp",
+        "sha256":  "f441c9427ca59239d4e628cc20e59c7508a76eb69fe88307c9d940e57a4f0ee7"
+    },
+    {
+        "path":  "imol/src/module.cpp",
+        "sha256":  "71184729d7c09a63c09314ec1c6afd65379da513167287f875a353b4819cc6cd"
+    },
+    {
         "path":  "imol/src/net/evppclientnetobject.cpp",
         "sha256":  "cb97349a2739264f4e3870b3274c3205c8bc5c7b74d44eb5395006ad41ba1e26"
     },
@@ -98,5 +94,61 @@
     {
         "path":  "imol/src/net/evppservernetobject.h",
         "sha256":  "7b4d8326e0733f38da7a7d12667eec73f60789f72b2b90bb739309afbc11f860"
+    },
+    {
+        "path":  "imol/src/netmanager.cpp",
+        "sha256":  "6a55af5f7857a89848a4bbe51557d41da48af69fa07d422397d12194a0bb8720"
+    },
+    {
+        "path":  "imol/src/xmodule.cpp",
+        "sha256":  "c695d297f7b30f30fff3312de2a9f9627bdf76052ac088b75535a0c92c5b633f"
+    },
+    {
+        "path":  "imol/src/xrobot.cpp",
+        "sha256":  "a7116a3af7fc396d850887516478892c4d62dc473d1466d56eb095cf23dec03f"
+    },
+    {
+        "path":  "imol/src/xsupport.cpp",
+        "sha256":  "9c4d53dcabb9f572e2dcb4d38e46fc1e6e9cc85479aee5d30fd00acb2f50cac0"
+    },
+    {
+        "path":  "imol/xmodule.h",
+        "sha256":  "b7b95417c1d84528beec71f5b05098233f0a4a2f8e8bf5ace8118512a0562db6"
+    },
+    {
+        "path":  "imol/xrobot.h",
+        "sha256":  "a2b955764ac67178f7c144dc88c996e69c30a8ff55acc3cfef8087e39dbc7369"
+    },
+    {
+        "path":  "imol/xsupport.h",
+        "sha256":  "96ea1f833898999a9e758f0bc1157da8cd8762165772141adfd288008c26d643"
+    },
+    {
+        "path":  "xservice/sdk/sdk_interface.h",
+        "sha256":  "1c7e3f5b342dcf343452adb53be1e97ed88cdea7bf4eb4c305fda490b74fda98"
+    },
+    {
+        "path":  "xservice/sdk/src/sdk_interface.cpp",
+        "sha256":  "e897b181da53e13ad78179fce85f341ee198c2b3929b4cf1ec6359b483deac52"
+    },
+    {
+        "path":  "xservice/sdk/src/sdkmodule.cpp",
+        "sha256":  "0c0eda4e2c89bd23f5e3489abcfc574ed9350671ab491da2bded5081a9008c4a"
+    },
+    {
+        "path":  "xservice/sdk/src/sdkmodule.h",
+        "sha256":  "60f5ac37ebf9ad433798525a92ddfa88e295f9a6e0593dc9e75582b7486df7dd"
+    },
+    {
+        "path":  "xservice/sys_socket/src/sys_socket_module.cpp",
+        "sha256":  "d2954bddcfed169734f4b67948c8de9849f07552f39c77c22c059b94b0b5668b"
+    },
+    {
+        "path":  "xservice/sys_socket/src/sys_socket_module.h",
+        "sha256":  "d28b823280c6c796d7408acabe7f0354230fa09f8200f908fa16e6b7b31fdc0b"
+    },
+    {
+        "path":  "xservice/sys_socket/sys_socket_def.h",
+        "sha256":  "e3262d011898cb167e051bd68d6013297eabbd0db7e7d5927c8b0f8c6e63b9bf"
     }
 ]
