@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>XMenu</class>
+ <widget class="QWidget" name="XMenu">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>784</width>
+    <height>30</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>XMenu</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget{
+outline:none;
+}
+QWidget#XMenu{
+background: &quot;color@sys.background&quot;;
+max-height:30px;
+}
+QPushButton {
+border: none;
+background: transparent;
+min-width:44px;
+min-height:30px;
+icon-size:16px;
+}
+QPushButton:hover {
+background:#3b3b3b;
+}
+QPushButton:pressed {
+background:#222222;
+}
+QPushButton#btnMinimize, QPushButton#btnMaximize, QPushButton#btnClose {
+icon-size: 12px;
+}
+QWidget#topmenu {
+background: transparent;
+}
+QLabel {
+color: &quot;color@sys.foreground&quot;;
+}
+QMenuBar {
+background: transparent;
+border:none;
+height: 30px;
+}
+QMenuBar::item {
+spacing: 0px;
+margin: 0px;
+padding: 0 12px;
+color: &quot;color@sys.foreground&quot;;
+border: none;
+}
+QMenuBar::item:selected {
+background: #444444;
+}</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QPushButton" name="btnBack">
+     <property name="minimumSize">
+      <size>
+       <width>44</width>
+       <height>30</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnForward"/>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnRefresh"/>
+   </item>
+   <item>
+    <widget class="QStackedWidget" name="stkWgt">
+     <widget class="QWidget" name="wgtSearch">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>9</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>9</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLineEdit" name="edtNav">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border:none;
+border-radius:12px;
+background:#444444;
+color:white;
+padding: 0 12px;
+min-height: 24px;</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnSearch">
+     <property name="minimumSize">
+      <size>
+       <width>44</width>
+       <height>30</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnMinimize">
+     <property name="minimumSize">
+      <size>
+       <width>44</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>16</width>
+       <height>16</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnMaximize">
+     <property name="minimumSize">
+      <size>
+       <width>44</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>16</width>
+       <height>16</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnClose">
+     <property name="styleSheet">
+      <string notr="true">QPushButton:hover {
+background: #cc2323;
+}
+QPushButton:pressed {
+background: brown;
+}</string>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>16</width>
+       <height>16</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

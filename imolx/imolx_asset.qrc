@@ -1,0 +1,28 @@
+<RCC>
+    <qresource prefix="/imolx">
+        <file>template/xservice.json</file>
+        <file>template/xsupport.json</file>
+        <file>template/xnav.json</file>
+        <file>template/xtheme.json</file>
+        <file>images/search.png</file>
+        <file>images/arrow.png</file>
+        <file>images/arrow@2x.png</file>
+        <file>images/box.png</file>
+        <file>images/box@2x.png</file>
+        <file>images/direction.png</file>
+        <file>images/direction@2x.png</file>
+        <file>images/refresh.png</file>
+        <file>images/refresh@2x.png</file>
+        <file>images/search@2x.png</file>
+        <file>images/triangle.png</file>
+        <file>images/triangle@2x.png</file>
+        <file>images/window.png</file>
+        <file>images/window@2x.png</file>
+        <file>images/edit.png</file>
+        <file>images/edit@2x.png</file>
+        <file>images/calculate.png</file>
+        <file>images/calculate@2x.png</file>
+        <file>images/doubledirection.png</file>
+        <file>images/doubledirection@2x.png</file>
+    </qresource>
+</RCC>

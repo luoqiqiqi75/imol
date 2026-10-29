@@ -7,3 +7,11 @@
 *.autosave
 *.log
 /log/
+*.lic
+/imolProgram*
+*.dll
+*.lib
+*.exp
+*.pdb
+Makefile*
+.qmake.stash

@@ -1,0 +1,68 @@
+﻿{
+    "zoom": 1.0,
+    "font": {
+        "windows": {
+            "normal": "Microsoft YaHei UI,9"
+        },
+        "default": "windows.normal"
+    },
+    "color": {
+        "red": {
+            "bordeaux": "#4c0009",
+            "china": "#e00102",
+            "xmate": "#c2252b",
+            "baidu": "#e10602",
+            "kfc": "#ab1a2d",
+            "haidilao": "#d90c1c",
+            "pepsi": "#eb1934"
+        },
+        "green": {
+            "mars": "#01847f",
+            "morandi": "#7b9379",
+            "millennium": "#336a42",
+            "forgive": "#82b96a",
+            "nvidia": "#84c01a",
+            "qt": "#92bd6c",
+            "wechat": "#07c160"
+        },
+        "blue": {
+            "tiffany": "#82d8cf",
+            "klein": "#012ea5",
+            "prussian": "#023f76",
+            "confluence": "#0049b0",
+            "dingding": "#0089ff",
+            "baidu": "#4e6ef2",
+            "pepsi": "#2152a1",
+            "github": "#161b22",
+            "vscode": "#007acc"
+        },
+        "brown": {
+            "mummy": "#8f4b28",
+            "haagen-dazs": "#600d22",
+            "dove": "#501f10"
+        },
+        "orange": {
+            "hermes": "#fe6d04",
+            "taobao": "#ff4500",
+            "pornhub": "#f7971e",
+            "xiaomi": "#ec6617"
+        },
+        "yellow": {
+            "meituan": "#ffc000"
+        },
+        "pink": {
+            "light": "#fbe8da"
+        },
+        "gray": {
+            "middle": "#c9c9c9",
+            "dark": "#333333"
+        },
+        "coffee": "#fad0a0",
+        "sys": {
+            "foreground": "#b2b2b2",
+            "background": "#2b2b2b",
+            "topic": "#557ec0"
+        }
+    },
+    "pixmap": {}
+}

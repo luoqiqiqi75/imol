@@ -1,0 +1,16 @@
+﻿{
+    "connected": false,
+    "timeout": 1600,
+    "host": {"ip": "192.168.0.160", "port": 6666},
+    "trigger": {"connect": null, "disconnect": null},
+    "proto": {
+        "imol": {
+            "version": {},
+            "data": {},
+            "command": {}
+        },
+        "data": {},
+        "command": {}
+    },
+    "debug": false
+}

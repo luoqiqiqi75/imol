@@ -1,0 +1,3 @@
+QMAKE_TARGET_PRODUCT = Imol
+VERSION = 10.2.0
+RC_ICONS = $$PWD/logo_imol.ico

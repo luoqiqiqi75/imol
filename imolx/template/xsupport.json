@@ -1,0 +1,150 @@
+﻿{
+    "type": "xcore",
+    "version": "",
+    "trigger": {
+        "g": {
+            "sys": {
+                "mode": null,
+                "state": null,
+                "power": null,
+                "posture": null,
+                "toolset": null
+            },
+            "data": {
+                "var": null,
+                "point": null,
+                "toolset": null
+            },
+            "device": {
+                "io": null
+            },
+            "config": {
+                "io_signal": null
+            }
+        },
+        "s": {
+            "sys": {
+                "toolset": null
+            },
+            "data": {
+                "var": null,
+                "point": null,
+                "toolset": null
+            },
+            "device": {
+                "io": null
+            }
+        },
+        "c": {
+            "hmi": {
+                "log": null
+            },
+            "sys": {
+                "calc": {
+                    "rot2quaternion": null,
+                    "quaternion2rot": null
+                }
+            },
+            "project": {
+                "reload": null,
+                "pp": {
+                    "refresh": null,
+                    "main": null,
+                    "routine": null
+                },
+                "next": null,
+                "prev": null,
+                "start": null,
+                "stop": null
+            }
+        }
+    },
+    "lircos": {
+        "setting": {
+            "hmisettinginfo": null
+        },
+        "hmicmd": {
+            "request": {
+                "cmd": 0,
+                "ext": 0,
+                "data": null
+            },
+            "response": {
+                "cmd": 0,
+                "ext": 0,
+                "data": null
+            },
+            "notify": {
+                "cmd": 0,
+                "ext": 0,
+                "data": null
+            }
+        },
+        "database": {
+            "request": {
+                "insert": {
+                    "table": "",
+                    "column": "",
+                    "value": ""
+                },
+                "delete": {
+                    "table": "",
+                    "condition": ""
+                },
+                "update": {
+                    "table": "",
+                    "set": "",
+                    "condition": ""
+                },
+                "select": {
+                    "table": "",
+                    "column": "",
+                    "condition": "",
+                    "addition": ""
+                }
+            },
+            "response": null
+        },
+        "event": {
+            "request": {
+                "thinfilm": {
+                    "key": null,
+                    "pressed": false
+                }
+            },
+            "response": null
+        },
+        "manager": {
+            "request": {
+                "coder": {
+                    "GetVar": null,
+                    "SetVar": null,
+                    "RefreshPP": null
+                },
+                "io": {
+                    "GetIoModelName": null,
+                    "GetSignalContent": null,
+                    "GetSignalValue": null,
+                    "SetSignalValue": null
+                },
+                "task": {
+                    "GetCurrentProject": null,
+                    "GetCurrentTaskID": null
+                },
+                "toolset": {
+                    "GetCurrent": null,
+                    "SetCurrent": null,
+                    "GetToolset": null,
+                    "SetToolset": null
+                }
+            },
+            "response": null
+        }
+    },
+    "xcore": {
+        "log": {
+            "level": "error",
+            "title": ""
+        }
+    }
+}

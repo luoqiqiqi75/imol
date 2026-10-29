@@ -1,0 +1,19 @@
+{
+    "file": {"imolx": "@IMOLX_LIBRARY_FILE@"},
+    "module": [{"path": "@IMOLX_LIBRARY_FILE@", "ui": {"xmenu": "0,0,1,4"}}],
+    "title": "IMOL",
+    "show": true,
+    "debug": true,
+    "splash": {"enable": false},
+    "server": {"enable": false},
+    "size": {"width": 1100, "height": 720, "windowed": true},
+    "ui": {
+        "topmenu": "0,0,1,4",
+        "toolbar": "1,0,1,4",
+        "navbar": "2,0,1,1",
+        "leftsidebar": "2,1,1,1",
+        "centerwidget": "2,2,1,1",
+        "rightsidebar": "2,3,1,1",
+        "statusbar": "3,0,1,4"
+    }
+}
